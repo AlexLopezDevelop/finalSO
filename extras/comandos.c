@@ -3,6 +3,12 @@
 //
 
 #include "comandos.h"
+#include "funciones.h"
+#include <string.h>
+#include <stdio.h>
+
+//#define PATH "/users/home/joan.ballber/PracticaFinalSO"
+#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
 void comandosPropios(char *instruccion, int totalParams) {
     char cmd[20];
@@ -32,9 +38,9 @@ void comandosPropios(char *instruccion, int totalParams) {
             struct sockaddr_in servidor;
 
             if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-                printF("Error creant el socket\n");
+                display("Error creant el socket\n");
             } else {
-                printF("Todo bien!\n");
+                display("Todo bien!\n");
             }
 
             bzero(&servidor, sizeof(servidor));
@@ -42,20 +48,20 @@ void comandosPropios(char *instruccion, int totalParams) {
             servidor.sin_port = htons(8710);
 
             if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
-                printF("Error configurant IP\n");
+                display("Error configurant IP\n");
             } else {
-                printF("Todo bien!2\n");
+                display("Todo bien!2\n");
             }
 
             if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
-                printF("Error fent el connect\n");
+                display("Error fent el connect\n");
             } else {
-                printF("Todo bien!3\n");
+                display("Todo bien!3\n");
             }
 
             write(socketFD, cmd, strlen(cmd));
 
-            printF("Missatge enviat!\n");
+            display("Missatge enviat!\n");
 
             close(socketFD);
 
@@ -109,6 +115,8 @@ void pedirInstruccion() {
         char *aux = NULL;
         char caracter = '\0';
         int lenEntradaUser = strlen(entradaUsuario);
+        char **paramList = NULL;
+        paramList = malloc((sizeof(char *)) * totalParams);
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];
@@ -119,7 +127,14 @@ void pedirInstruccion() {
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
 
-                if (totalParams == 0) {
+                if (caracter == '\n') {
+                    aux[strcspn(aux, "\n")] = 0;
+                }
+
+                paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
+                strcpy(paramList[totalParams], aux);
+
+                /*if (totalParams == 0) {
                     instruccion = malloc(sizeof(char) * strlen(aux));
                     strcpy(instruccion, aux);
                     instruccion[strcspn(instruccion, " ")] = 0;
@@ -133,7 +148,7 @@ void pedirInstruccion() {
                     param2 = malloc(sizeof(char) * strlen(aux));
                     strcpy(param2, aux);
                     param2[strcspn(param2, "\n")] = 0;
-                }
+                }*/
                 totalParams++;
                 aux = NULL;
                 liberarMemoria(aux);
@@ -142,12 +157,17 @@ void pedirInstruccion() {
         }
         // END Separar instruccion y parametros
 
-        char *parmList[] = {instruccion, param, param2, PATH, NULL};
+        // Añadir el NULL al final del params
+        paramList[totalParams] = NULL;
+        totalParams++;
+
+        //char *parmList[] = {instruccion, param, param2, PATH, NULL};
+
         int pid = fork();
 
-        if (pid == 0) {
-            if (execvp(instruccion, parmList) == -1) {
-                comandosPropios(instruccion, totalParams);
+        if (pid > 0) {
+            if (execv(PATH, paramList) == -1) {
+                comandosPropios(paramList[0], totalParams);
             }
         }
     }

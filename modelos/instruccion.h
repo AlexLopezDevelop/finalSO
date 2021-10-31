@@ -10,8 +10,8 @@ typedef struct {
 } Param;
 
 typedef struct {
-    char * instruccion;
-    Param * params;
+    char * instruccion; // ls
+    Param * params; // -l -a ..
     int totalParams = 0;
 } Instruccion;
 

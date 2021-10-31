@@ -3,9 +3,8 @@
 //
 
 #include "ficheros.h"
-
-//#define PATH "/users/home/joan.ballber/PracticaFinalSO"
-#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
+#include <stdio.h>
+#include "funciones.h"
 
 void leerFichero(char *pathFile, ConfiguracionConfig *config) {
 
