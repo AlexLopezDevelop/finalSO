@@ -166,7 +166,7 @@ void pedirInstruccion() {
         char *parmList[] = {instruccion, param, param2, PATH, NULL};
         int pid = fork();
 
-        if (pid > 0) {
+        if (pid == 0) {
             if (execvp(instruccion, parmList) == -1) {
                 comandosPropios(instruccion, totalParams);
             }
