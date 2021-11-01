@@ -7,8 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 
-//#define PATH "/users/home/joan.ballber/PracticaFinalSO"
-#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
+#define PATH "/users/home/joan.ballber/finalSO-master"
+//#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
 void comandosPropios(char *instruccion, int totalParams) {
     char cmd[20];
@@ -33,8 +33,8 @@ void comandosPropios(char *instruccion, int totalParams) {
     display(aux);
 
     if (strcmp("LOGIN", cmd) == 0) {
-        if (totalParams == 3) {
-            int socketFD;
+        if (totalParams == 2) {
+         /*   int socketFD;
             struct sockaddr_in servidor;
 
             if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
@@ -64,7 +64,7 @@ void comandosPropios(char *instruccion, int totalParams) {
             display("Missatge enviat!\n");
 
             close(socketFD);
-
+*/
         } else {
             display("Comanda KO. Falta paràmetres\n");
         }
@@ -100,14 +100,15 @@ void pedirInstruccion() {
     while (1) {
 
         char entradaUsuario[40];
+        char aux2[200];
 
         read(0, entradaUsuario, 40);
 
         entradaUsuario[strcspn(entradaUsuario, "\n") + 1] = '\0';
 
-        char *instruccion = NULL;
-        char *param = NULL;
-        char *param2 = NULL;
+        //char *instruccion = NULL;
+        //char *param = NULL;
+        //char *param2 = NULL;
         int totalParams = 0;
 
         //  Separar instruccion y parametros
@@ -132,6 +133,8 @@ void pedirInstruccion() {
                 }
 
                 paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
+                aux[strcspn(aux, " ")] = 0;
+                aux[strcspn(aux, "\n")] = 0;
                 strcpy(paramList[totalParams], aux);
 
                 /*if (totalParams == 0) {
@@ -162,12 +165,14 @@ void pedirInstruccion() {
         totalParams++;
 
         //char *parmList[] = {instruccion, param, param2, PATH, NULL};
-
         int pid = fork();
 
         if (pid > 0) {
             if (execv(PATH, paramList) == -1) {
-                comandosPropios(paramList[0], totalParams);
+
+                sprintf(aux2,"%d", totalParams);
+                display(aux2);
+                comandosPropios(paramList[0], totalParams-2);
             }
         }
     }
