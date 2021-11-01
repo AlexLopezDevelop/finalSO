@@ -69,15 +69,15 @@ void comandosPropios(char *instruccion, int totalParams) {
             display("Comanda KO. Falta paràmetres\n");
         }
     } else if (strcmp("PHOTO", cmd) == 0) {
-        if (totalParams == 2) {
+        if (totalParams == 1) {
             display("Comanda OK\n");
         }
     } else if (strcmp("SEARCH", cmd) == 0) {
-        if (totalParams == 2) {
+        if (totalParams == 1) {
             display("Comanda OK\n");
         }
     } else if (strcmp("SEND", cmd) == 0) {
-        if (totalParams == 2) {
+        if (totalParams == 1) {
             display("Comanda OK\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
