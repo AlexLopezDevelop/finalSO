@@ -100,15 +100,14 @@ void pedirInstruccion() {
     while (1) {
 
         char entradaUsuario[40];
-        char aux2[200];
 
         read(0, entradaUsuario, 40);
 
         entradaUsuario[strcspn(entradaUsuario, "\n") + 1] = '\0';
 
-        //char *instruccion = NULL;
-        //char *param = NULL;
-        //char *param2 = NULL;
+        char *instruccion = NULL;
+        char *param = NULL;
+        char *param2 = NULL;
         int totalParams = 0;
 
         //  Separar instruccion y parametros
@@ -128,16 +127,15 @@ void pedirInstruccion() {
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
 
-                if (caracter == '\n') {
-                    aux[strcspn(aux, "\n")] = 0;
-                }
+                //if (caracter == '\n') {
+                    //aux[strcspn(aux, "\n")] = 0;
+                //}
 
-                paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
-                aux[strcspn(aux, " ")] = 0;
-                aux[strcspn(aux, "\n")] = 0;
-                strcpy(paramList[totalParams], aux);
+                //paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
+                //aux[strcspn(aux, " ")] = 0;
+                //strcpy(paramList[totalParams], aux);
 
-                /*if (totalParams == 0) {
+                if (totalParams == 0) {
                     instruccion = malloc(sizeof(char) * strlen(aux));
                     strcpy(instruccion, aux);
                     instruccion[strcspn(instruccion, " ")] = 0;
@@ -151,7 +149,8 @@ void pedirInstruccion() {
                     param2 = malloc(sizeof(char) * strlen(aux));
                     strcpy(param2, aux);
                     param2[strcspn(param2, "\n")] = 0;
-                }*/
+                }
+
                 totalParams++;
                 aux = NULL;
                 liberarMemoria(aux);
@@ -161,18 +160,15 @@ void pedirInstruccion() {
         // END Separar instruccion y parametros
 
         // Añadir el NULL al final del params
-        paramList[totalParams] = NULL;
-        totalParams++;
+        //paramList[totalParams] = NULL;
+        //totalParams++;
 
-        //char *parmList[] = {instruccion, param, param2, PATH, NULL};
+        char *parmList[] = {instruccion, param, param2, PATH, NULL};
         int pid = fork();
 
         if (pid > 0) {
-            if (execv(PATH, paramList) == -1) {
-
-                sprintf(aux2,"%d", totalParams);
-                display(aux2);
-                comandosPropios(paramList[0], totalParams-2);
+            if (execvp(instruccion, parmList) == -1) {
+                comandosPropios(instruccion, totalParams);
             }
         }
     }
