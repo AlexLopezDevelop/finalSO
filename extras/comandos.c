@@ -34,13 +34,13 @@ void comandosPropios(char *instruccion, int totalParams) {
 
     if (strcmp("LOGIN", cmd) == 0) {
         if (totalParams == 2) {
+            display("Comanda OK\n");
          /*   int socketFD;
             struct sockaddr_in servidor;
 
             if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
                 display("Error creant el socket\n");
             } else {
-                display("Todo bien!\n");
             }
 
             bzero(&servidor, sizeof(servidor));
@@ -50,13 +50,11 @@ void comandosPropios(char *instruccion, int totalParams) {
             if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
                 display("Error configurant IP\n");
             } else {
-                display("Todo bien!2\n");
             }
 
             if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
                 display("Error fent el connect\n");
             } else {
-                display("Todo bien!3\n");
             }
 
             write(socketFD, cmd, strlen(cmd));
@@ -71,10 +69,14 @@ void comandosPropios(char *instruccion, int totalParams) {
     } else if (strcmp("PHOTO", cmd) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
+        } else {
+            display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEARCH", cmd) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
+        } else {
+            display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", cmd) == 0) {
         if (totalParams == 1) {
@@ -168,7 +170,7 @@ void pedirInstruccion() {
 
         if (pid == 0) {
             if (execvp(instruccion, parmList) == -1) {
-                comandosPropios(instruccion, totalParams);
+                comandosPropios(instruccion, totalParams-1);
             }
         }
     }
