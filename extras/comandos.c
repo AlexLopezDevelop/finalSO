@@ -115,8 +115,8 @@ void pedirInstruccion() {
         char *aux = NULL;
         char caracter = '\0';
         int lenEntradaUser = strlen(entradaUsuario);
-        char **paramList = NULL;
-        paramList = malloc((sizeof(char *)) * totalParams);
+        //char **paramList = NULL;
+        //paramList = malloc((sizeof(char *)) * totalParams);
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];

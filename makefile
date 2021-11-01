@@ -1,6 +1,6 @@
 all:PracticaFinal
 
-main.o: main.c extras/funciones.h extras/ficheros.h modelos/configuracion extras/comandos.h
+main.o: main.c extras/funciones.h extras/ficheros.h modelos/configuracion.h extras/comandos.h
 		gcc -c main.c -Wall -Wextra
 
 funciones.o: extras/funciones.c extras/funciones.h
