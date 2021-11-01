@@ -168,7 +168,7 @@ void pedirInstruccion() {
 
         if (pid == 0) {
             if (execvp(instruccion, parmList) == -1) {
-                comandosPropios(instruccion, totalParams);
+                comandosPropios(instruccion, totalParams - 1);
             }
         }
     }
