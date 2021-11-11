@@ -7,8 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#define PATH "/users/home/joan.ballber/finalSO-master"
-//#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
+//#define PATH "/users/home/joan.ballber/finalSO-master"
+#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
 void comandosPropios(char *instruccion, int totalParams) {
     char cmd[20];
@@ -129,31 +129,14 @@ void pedirInstruccion() {
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
 
-                if (totalParams == 0) {
-                    instruccion = malloc(sizeof(char) * strlen(aux));
-                    strcpy(instruccion, aux);
-                    instruccion[strcspn(instruccion, " ")] = 0;
-                    instruccion[strcspn(instruccion, "\n")] = 0;
-                } else {
-                    if (caracter == '\n') {
-                        aux[strcspn(aux, "\n")] = 0;
-                    }
 
-                    paramList[totalParams - 1] = malloc(sizeof(char) * strlen(aux));
-                    aux[strcspn(aux, " ")] = 0;
-                    strcpy(paramList[totalParams - 1], aux);
+                if (caracter == '\n') {
+                    aux[strcspn(aux, "\n")] = 0;
                 }
 
-                /*else if (totalParams == 1) {
-                    param = malloc(sizeof(char) * strlen(aux));
-                    strcpy(param, aux);
-                    param[strcspn(param, "\n")] = 0;
-                    param[strcspn(param, " ")] = 0;
-                } else if (totalParams == 2) {
-                    param2 = malloc(sizeof(char) * strlen(aux));
-                    strcpy(param2, aux);
-                    param2[strcspn(param2, "\n")] = 0;
-                }*/
+                paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
+                aux[strcspn(aux, " ")] = 0;
+                strcpy(paramList[totalParams], aux);
 
                 totalParams++;
                 aux = NULL;
@@ -164,16 +147,15 @@ void pedirInstruccion() {
         // END Separar instruccion y parametros
 
         // Añadir el NULL al final del params
-        paramList[totalParams - 1] = NULL;
+        paramList[totalParams] = NULL;
         totalParams++;
 
-        //char *parmList[] = {instruccion, param, param2, PATH, NULL};
         //int pid = fork();
 
         //if (pid == 0) {
 
-        if (execvp(instruccion, paramList) == -1) {
-            comandosPropios(instruccion, totalParams - 1);
+        if (execv(PATH, paramList) == -1) {
+            comandosPropios(paramList[0], totalParams - 1);
         }
         //}
     }
