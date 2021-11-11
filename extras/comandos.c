@@ -35,34 +35,34 @@ void comandosPropios(char *instruccion, int totalParams) {
     if (strcmp("LOGIN", cmd) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
-         /*   int socketFD;
-            struct sockaddr_in servidor;
+            /*   int socketFD;
+               struct sockaddr_in servidor;
 
-            if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-                display("Error creant el socket\n");
-            } else {
-            }
+               if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+                   display("Error creant el socket\n");
+               } else {
+               }
 
-            bzero(&servidor, sizeof(servidor));
-            servidor.sin_family = AF_INET;
-            servidor.sin_port = htons(8710);
+               bzero(&servidor, sizeof(servidor));
+               servidor.sin_family = AF_INET;
+               servidor.sin_port = htons(8710);
 
-            if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
-                display("Error configurant IP\n");
-            } else {
-            }
+               if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
+                   display("Error configurant IP\n");
+               } else {
+               }
 
-            if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
-                display("Error fent el connect\n");
-            } else {
-            }
+               if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
+                   display("Error fent el connect\n");
+               } else {
+               }
 
-            write(socketFD, cmd, strlen(cmd));
+               write(socketFD, cmd, strlen(cmd));
 
-            display("Missatge enviat!\n");
+               display("Missatge enviat!\n");
 
-            close(socketFD);
-*/
+               close(socketFD);
+   */
         } else {
             display("Comanda KO. Falta paràmetres\n");
         }
@@ -108,8 +108,8 @@ void pedirInstruccion() {
         entradaUsuario[strcspn(entradaUsuario, "\n") + 1] = '\0';
 
         char *instruccion = NULL;
-        char *param = NULL;
-        char *param2 = NULL;
+        //char *param = NULL;
+        //char *param2 = NULL;
         int totalParams = 0;
 
         //  Separar instruccion y parametros
@@ -117,8 +117,8 @@ void pedirInstruccion() {
         char *aux = NULL;
         char caracter = '\0';
         int lenEntradaUser = strlen(entradaUsuario);
-        //char **paramList = NULL;
-        //paramList = malloc((sizeof(char *)) * totalParams);
+        char **paramList = NULL;
+        paramList = malloc((sizeof(char *)) * totalParams);
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];
@@ -129,20 +129,22 @@ void pedirInstruccion() {
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
 
-                //if (caracter == '\n') {
-                    //aux[strcspn(aux, "\n")] = 0;
-                //}
-
-                //paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
-                //aux[strcspn(aux, " ")] = 0;
-                //strcpy(paramList[totalParams], aux);
-
                 if (totalParams == 0) {
                     instruccion = malloc(sizeof(char) * strlen(aux));
                     strcpy(instruccion, aux);
                     instruccion[strcspn(instruccion, " ")] = 0;
                     instruccion[strcspn(instruccion, "\n")] = 0;
-                } else if (totalParams == 1) {
+                } else {
+                    if (caracter == '\n') {
+                        aux[strcspn(aux, "\n")] = 0;
+                    }
+
+                    paramList[totalParams - 1] = malloc(sizeof(char) * strlen(aux));
+                    aux[strcspn(aux, " ")] = 0;
+                    strcpy(paramList[totalParams - 1], aux);
+                }
+
+                /*else if (totalParams == 1) {
                     param = malloc(sizeof(char) * strlen(aux));
                     strcpy(param, aux);
                     param[strcspn(param, "\n")] = 0;
@@ -151,7 +153,7 @@ void pedirInstruccion() {
                     param2 = malloc(sizeof(char) * strlen(aux));
                     strcpy(param2, aux);
                     param2[strcspn(param2, "\n")] = 0;
-                }
+                }*/
 
                 totalParams++;
                 aux = NULL;
@@ -162,16 +164,17 @@ void pedirInstruccion() {
         // END Separar instruccion y parametros
 
         // Añadir el NULL al final del params
-        //paramList[totalParams] = NULL;
-        //totalParams++;
+        paramList[totalParams - 1] = NULL;
+        totalParams++;
 
-        char *parmList[] = {instruccion, param, param2, PATH, NULL};
-        int pid = fork();
+        //char *parmList[] = {instruccion, param, param2, PATH, NULL};
+        //int pid = fork();
 
-        if (pid == 0) {
-            if (execvp(instruccion, parmList) == -1) {
-                comandosPropios(instruccion, totalParams-1);
-            }
+        //if (pid == 0) {
+
+        if (execvp(instruccion, paramList) == -1) {
+            comandosPropios(instruccion, totalParams - 1);
         }
+        //}
     }
 }
