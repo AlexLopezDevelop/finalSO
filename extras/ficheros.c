@@ -23,3 +23,20 @@ void leerFichero(char *pathFile, ConfiguracionConfig *config) {
     }
 
 }
+
+void leerFicheroArtreides(char *pathFile, ConfiguracionArtreides *configArtreides) {
+
+    int fd;
+
+    fd = open(pathFile, O_RDONLY);
+
+    errorAbrir(fd, pathFile);
+
+    while (!checkEOF(fd)) {
+        strcpy(configArtreides->ip, readLineFile(fd, '\n'));
+        configArtreides->puerto = atoi(readLineFile(fd, '\n'));
+        strcpy(configArtreides->directorio, readLineFile(fd, '\n'));
+
+    }
+
+}

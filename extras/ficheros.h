@@ -9,4 +9,8 @@
 
 void leerFichero(char *pathFile, ConfiguracionConfig *config);
 
+void leerFicheroArtreides(char *pathFile, ConfiguracionArtreides *configArtreides);
+
+
+
 #endif //PRACTICAFINALSO_FICHEROS_H
