@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
+#include <sys/wait.h>   // wait
 #include <netdb.h>
 #include <stdio.h>      // sprintf
 #include <unistd.h>     // hauria de ser red write open y close

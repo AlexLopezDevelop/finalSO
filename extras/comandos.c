@@ -107,7 +107,6 @@ void pedirInstruccion() {
 
         entradaUsuario[strcspn(entradaUsuario, "\n") + 1] = '\0';
 
-        char *instruccion = NULL;
         //char *param = NULL;
         //char *param2 = NULL;
         int totalParams = 0;
@@ -138,6 +137,7 @@ void pedirInstruccion() {
                 aux[strcspn(aux, " ")] = 0;
                 strcpy(paramList[totalParams], aux);
 
+
                 totalParams++;
                 aux = NULL;
                 liberarMemoria(aux);
@@ -148,15 +148,62 @@ void pedirInstruccion() {
 
         // Añadir el NULL al final del params
         paramList[totalParams] = NULL;
-        totalParams++;
 
-        //int pid = fork();
 
-        //if (pid == 0) {
+        // Varables_locales
+        pid_t son_pid;
 
-        if (execv(PATH, paramList) == -1) {
+
+        // Fork
+        son_pid = fork();
+
+        switch (son_pid) {
+            case -1:
+                // Error
+                display("Error en el fork!\n");
+                break;
+            case 0:
+                // Hijo
+                display("------------------------------------------------------------\n");
+                if (execvp(paramList[0], paramList) == -1) {
+                    comandosPropios(paramList[0], totalParams - 1);
+                    display("------------------------------------------------------------\n");
+                }
+                break;
+            default:
+                // Padre
+                wait(NULL);
+                display("------------------------------------------------------------\n");
+                break;
+        }
+
+        /*
+        pid_t child_pid;
+
+        child_pid = fork();
+        if(child_pid == 0) {
+            execvp(paramList[0], paramList);
             comandosPropios(paramList[0], totalParams - 1);
         }
-        //}
+        else {
+            wait(NULL);
+        }
+
+        int pid = fork();
+
+
+        if (pid == 0) {
+
+        if (execvp(paramList[0], paramList) == -1) {
+            comandosPropios(paramList[0], totalParams - 1);
+        } else{
+            do {
+                pid_t tpid = wait(&child_status);
+                if(tpid != child_pid) process_terminated(tpid);
+            } while(tpid != child_pid);
+
+            return child_status;
+        }
+        }*/
     }
 }
