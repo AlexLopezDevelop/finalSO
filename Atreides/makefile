@@ -1,19 +1,19 @@
 all:Atreides
 
 atreides.o: atreides.c ../extras/funciones.h ../extras/ficheros.h ../modelos/configuracion.h
-		gcc -c atreides.c -Wall -Wextra
+		gcc -c atreides.c -Wall -Wextra -lpthread
 
 funciones.o: ../extras/funciones.c ../extras/funciones.h
-		gcc -c ../extras/funciones.c -Wall -Wextra
+		gcc -c ../extras/funciones.c -Wall -Wextra -lpthread
 
 ficheros.o: ../extras/ficheros.c ../extras/ficheros.h ../extras/funciones.h
-		gcc -c ../extras/ficheros.c -Wall -Wextra
+		gcc -c ../extras/ficheros.c -Wall -Wextra -lpthread
 
 comandos.o: ../extras/comandos.c ../extras/comandos.h
-		gcc -c ../extras/comandos.c -Wall -Wextra
+		gcc -c ../extras/comandos.c -Wall -Wextra -lpthread
 
 Atreides: atreides.o funciones.o ficheros.o comandos.o
-		gcc atreides.o funciones.o ficheros.o comandos.o -o Atreides.exe -Wall -Wextra
+		gcc atreides.o funciones.o ficheros.o comandos.o -o Atreides.exe -Wall -Wextra -lpthread
 
 clean:
 		rm -rf *.o *.exe

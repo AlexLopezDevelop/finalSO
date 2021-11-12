@@ -7,6 +7,7 @@
 
 // Librerias GENERALES
 #define _GNU_SOURCE
+#include <pthread.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <signal.h>

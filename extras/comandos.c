@@ -35,7 +35,7 @@ void comandosPropios(char *instruccion, int totalParams) {
     if (strcmp("LOGIN", cmd) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
-            /*   int socketFD;
+               int socketFD;
                struct sockaddr_in servidor;
 
                if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
@@ -61,8 +61,6 @@ void comandosPropios(char *instruccion, int totalParams) {
 
                display("Missatge enviat!\n");
 
-               close(socketFD);
-   */
         } else {
             display("Comanda KO. Falta paràmetres\n");
         }
