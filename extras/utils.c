@@ -14,13 +14,12 @@ void * comprobarNombres(void *arg) {
 
 
     printf("clientFD2: %d\n",clientFD);
-    char buffer[100];
+    char **buffer = {};
     while (salir == 0) {
-        read(clientFD, buffer, 100);
-        display("entra");
-        display(buffer);
+        read(clientFD, buffer, sizeof(char**));
+        display(buffer[0]);
 
-        if (strcmp(buffer, "salir") == 0) {
+        if (strcmp(buffer[0], "salir") == 0) {
             display("\nCliente Desconectado!\n\n");
             close(clientFD);
             salir = 1;

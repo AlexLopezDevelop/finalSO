@@ -35,8 +35,7 @@ void establecerConexion (char **instruccion){
       } else {
       }
 
-
-      write(socketFD, instruccion[0], strlen(instruccion[0]));
+      write(socketFD, instruccion, strlen(instruccion[0]));
 
       display("Missatge enviat!\n");
 
@@ -49,6 +48,8 @@ void comandosPropios(char **instruccion, int totalParams) {
     display(instruccion[1]);
     sprintf(cmd,"t: %d",totalParams);
     display(cmd);
+
+    // Pasar a mayusculas
     while (instruccion[0][i] != '\0') {
         if (instruccion[0][i] >= 'a' && instruccion[0][i] <= 'z') {
             instruccion[0][i] = instruccion[0][i] - 32;
