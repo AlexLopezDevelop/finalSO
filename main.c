@@ -3,9 +3,6 @@
 #include "modelos/configuracion.h"
 #include "extras/comandos.h"
 
-
-#define printF(x) write(1, x, strlen(x))
-
 int main(int argc, char *argv[]) {
 
     ConfiguracionConfig config;
