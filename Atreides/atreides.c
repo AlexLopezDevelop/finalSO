@@ -7,14 +7,13 @@
 
 
 #define printF(x) write(1, x, strlen(x))
-// TODO: Revisar de donde saca el modelo de config
+
 
 int listenFD;
 
-void * comprobarNombres(void arg) {
-    int clientFD = *((int *) arg;
+void * comprobarNombres(void *arg) {
+    int clientFD = *(int *) arg;
     int salir=0;
-
 
     printf("clientFD2: %d\n",clientFD);
     char buffer[100];
@@ -82,7 +81,7 @@ int main(int argc, char *argv[]) {
 
         pthread_t thrd;
         printf("clientFD: %d\n",clientFD);
-        pthread_create(&thrd, NULL, comprobarNombres, clientFD);
+        pthread_create(&thrd, NULL, comprobarNombres, (void*) &clientFD);
     }
 
 }

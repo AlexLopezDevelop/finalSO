@@ -10,79 +10,84 @@
 //#define PATH "/users/home/joan.ballber/finalSO-master"
 #define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
-void comandosPropios(char *instruccion, int totalParams) {
+void establecerConexion (char **instruccion){
+
+    int socketFD;
+    struct sockaddr_in servidor;
+
+
+      if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+          display("Error creant el socket\n");
+      } else {
+      }
+
+      bzero(&servidor, sizeof(servidor));
+      servidor.sin_family = AF_INET;
+      servidor.sin_port = htons(8710);
+
+      if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
+          display("Error configurant IP\n");
+      } else {
+      }
+
+      if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
+          display("Error fent el connect\n");
+      } else {
+      }
+
+
+      write(socketFD, instruccion[0], strlen(instruccion[0]));
+
+      display("Missatge enviat!\n");
+
+  }
+
+void comandosPropios(char **instruccion, int totalParams) {
     char cmd[20];
     int i = 0;
 
-
-    while (instruccion[i] != '\0') {
-        if (instruccion[i] >= 'a' && instruccion[i] <= 'z') {
-            instruccion[i] = instruccion[i] - 32;
+    display(instruccion[1]);
+    sprintf(cmd,"t: %d",totalParams);
+    display(cmd);
+    while (instruccion[0][i] != '\0') {
+        if (instruccion[0][i] >= 'a' && instruccion[0][i] <= 'z') {
+            instruccion[0][i] = instruccion[0][i] - 32;
         }
         i++;
     }
 
-    int lenInstruccion = strlen(instruccion);
+    display(instruccion[0]);
 
-    for (int j = 0; j < lenInstruccion; ++j) {
-        cmd[j] = instruccion[j];
-    }
-    char aux[30];
-
-    sprintf(aux, "|%s|", cmd);
-    display(aux);
-
-    if (strcmp("LOGIN", cmd) == 0) {
+    if (strcmp("LOGIN", instruccion[0]) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
-               int socketFD;
-               struct sockaddr_in servidor;
-
-               if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-                   display("Error creant el socket\n");
-               } else {
-               }
-
-               bzero(&servidor, sizeof(servidor));
-               servidor.sin_family = AF_INET;
-               servidor.sin_port = htons(8710);
-
-               if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
-                   display("Error configurant IP\n");
-               } else {
-               }
-
-               if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
-                   display("Error fent el connect\n");
-               } else {
-               }
-
-               write(socketFD, cmd, strlen(cmd));
-
-               display("Missatge enviat!\n");
+            establecerConexion(instruccion);
 
         } else {
             display("Comanda KO. Falta paràmetres\n");
         }
-    } else if (strcmp("PHOTO", cmd) == 0) {
+    } else if (strcmp("PHOTO", instruccion[0]) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
+            establecerConexion(instruccion);
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("SEARCH", cmd) == 0) {
+    } else if (strcmp("SEARCH", instruccion[0]) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
+            establecerConexion(instruccion);
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("SEND", cmd) == 0) {
+    } else if (strcmp("SEND", instruccion[0]) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
+            establecerConexion(instruccion);
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("LOGOUT", cmd) == 0) {
+    } else if (strcmp("LOGOUT", instruccion[0]) == 0) {
         if (totalParams <= 1) {
             display("Comanda OK\n");
         } else {
@@ -90,7 +95,7 @@ void comandosPropios(char *instruccion, int totalParams) {
         }
     } else {
         display("No se ha encontrado el comando ");
-        display(instruccion);
+        display(instruccion[0]);
         display("\n");
     }
 }
@@ -164,7 +169,7 @@ void pedirInstruccion() {
                 // Hijo
                 display("------------------------------------------------------------\n");
                 if (execvp(paramList[0], paramList) == -1) {
-                    comandosPropios(paramList[0], totalParams - 1);
+                    comandosPropios(paramList, totalParams - 1);
                     display("------------------------------------------------------------\n");
                 }
                 break;
