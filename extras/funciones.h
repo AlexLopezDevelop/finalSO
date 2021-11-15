@@ -50,4 +50,6 @@ int errorAbrir(int fd, char *nombre_f);
 
 void readInput(char **string);
 
+char * readStringTo (char * string, char hasta);
+
 #endif //PRACTICAFINALSO_FUNCIONES_H

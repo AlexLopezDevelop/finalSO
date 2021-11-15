@@ -12,14 +12,18 @@ void * comprobarNombres(void *arg) {
     int clientFD = *(int *) arg;
     int salir=0;
 
-
-    printf("clientFD2: %d\n",clientFD);
-    char **buffer = {};
+    char buffer[100];
     while (salir == 0) {
-        read(clientFD, buffer, sizeof(char**));
-        display(buffer[0]);
+        read(clientFD, buffer, sizeof(buffer));
+        display(buffer);
+        char buff[16] = "Login algo algo";
 
-        if (strcmp(buffer[0], "salir") == 0) {
+
+        char *comando = readStringTo(buff,' ');
+        display("Comando: ");
+        display(comando);
+
+        if (strcmp(buffer, "salir") == 0) {
             display("\nCliente Desconectado!\n\n");
             close(clientFD);
             salir = 1;

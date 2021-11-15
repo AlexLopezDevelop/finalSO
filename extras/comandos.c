@@ -10,7 +10,7 @@
 //#define PATH "/users/home/joan.ballber/finalSO-master"
 #define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
-void establecerConexion (char **instruccion){
+int establecerConexion (){
 
     int socketFD;
     struct sockaddr_in servidor;
@@ -35,17 +35,16 @@ void establecerConexion (char **instruccion){
       } else {
       }
 
-      write(socketFD, instruccion, strlen(instruccion[0]));
-
-      display("Missatge enviat!\n");
+    return socketFD;
 
   }
 
-void comandosPropios(char **instruccion, int totalParams) {
+
+void comandosPropios(char **instruccion, int totalParams, int socketFD) {
     char cmd[20];
     int i = 0;
 
-    display(instruccion[1]);
+    display(instruccion[0]);
     sprintf(cmd,"t: %d",totalParams);
     display(cmd);
 
@@ -62,7 +61,9 @@ void comandosPropios(char **instruccion, int totalParams) {
     if (strcmp("LOGIN", instruccion[0]) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
-            establecerConexion(instruccion);
+            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+
+            display("Missatge enviat!\n");
 
         } else {
             display("Comanda KO. Falta paràmetres\n");
@@ -70,27 +71,36 @@ void comandosPropios(char **instruccion, int totalParams) {
     } else if (strcmp("PHOTO", instruccion[0]) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            establecerConexion(instruccion);
+            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+
+            display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEARCH", instruccion[0]) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            establecerConexion(instruccion);
+            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+
+            display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", instruccion[0]) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            establecerConexion(instruccion);
+            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+
+            display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("LOGOUT", instruccion[0]) == 0) {
-        if (totalParams <= 1) {
+        if (strcmp("LOGOUT", instruccion[0]) == 0) {
             display("Comanda OK\n");
+            write(socketFD, "salir", sizeof("salir"));
+
+            display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
@@ -102,7 +112,7 @@ void comandosPropios(char **instruccion, int totalParams) {
 }
 
 void pedirInstruccion() {
-
+    int socketFD = establecerConexion();
     while (1) {
 
         char entradaUsuario[40];
@@ -170,7 +180,7 @@ void pedirInstruccion() {
                 // Hijo
                 display("------------------------------------------------------------\n");
                 if (execvp(paramList[0], paramList) == -1) {
-                    comandosPropios(paramList, totalParams - 1);
+                    comandosPropios(paramList, totalParams - 1,socketFD);
                     display("------------------------------------------------------------\n");
                 }
                 break;
