@@ -201,33 +201,5 @@ void pedirInstruccion() {
                     break;
             }
         }
-        /*
-        pid_t child_pid;
-
-        child_pid = fork();
-        if(child_pid == 0) {
-            execvp(paramList[0], paramList);
-            comandosPropios(paramList[0], totalParams - 1);
-        }
-        else {
-            wait(NULL);
-        }
-
-        int pid = fork();
-
-
-        if (pid == 0) {
-
-        if (execvp(paramList[0], paramList) == -1) {
-            comandosPropios(paramList[0], totalParams - 1);
-        } else{
-            do {
-                pid_t tpid = wait(&child_status);
-                if(tpid != child_pid) process_terminated(tpid);
-            } while(tpid != child_pid);
-
-            return child_status;
-        }
-        }*/
     }
 }
