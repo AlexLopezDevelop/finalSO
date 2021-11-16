@@ -11,7 +11,11 @@ int main(int argc, char *argv[]) {
 
     display("Benvingut a Fremen\n");
 
-    leerFichero(argv[1], &config);
+    if (leerFichero(argv[1], &config)) {
+        return 1;
+    }
 
     pedirInstruccion();
+
+    return 0;
 }

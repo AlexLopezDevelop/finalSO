@@ -15,4 +15,6 @@ void salir();
 
 void gestorDeSockets();
 
+char * concatenarStrings(char **instruccion);
+
 #endif //FINALSO_UTILS_H

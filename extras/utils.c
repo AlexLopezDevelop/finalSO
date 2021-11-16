@@ -10,9 +10,16 @@ int listenFD;
 
 void * comprobarNombres(void *arg) {
     int clientFD = *(int *) arg;
-    int salir=0;
+    //int salir=0;
 
-    char buffer[100];
+    char **paramList = NULL;
+    paramList = malloc((sizeof(char *)) * 3);
+
+    read(clientFD, paramList, sizeof(paramList));
+
+    display(paramList[0]);
+
+    /*char buffer[100];
     while (salir == 0) {
         read(clientFD, buffer, sizeof(buffer));
         display(buffer);
@@ -30,7 +37,7 @@ void * comprobarNombres(void *arg) {
         }
     }
     pthread_cancel(pthread_self());
-    pthread_detach(pthread_self());
+    pthread_detach(pthread_self());*/
 
     return NULL;
 }

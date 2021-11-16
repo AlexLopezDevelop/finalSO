@@ -57,7 +57,7 @@ int errorAbrir(int fd, char *nombre_f) {
     char aux[200];
 
     if (fd < 0) {
-        sprintf(aux, "\nERROR al abrir el fichero: %s\n", nombre_f);
+        sprintf(aux, "\nERROR al abrir el fichero\n");
         display(aux);
         return 1;
     } else {

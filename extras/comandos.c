@@ -4,6 +4,7 @@
 
 #include "comandos.h"
 #include "funciones.h"
+#include "utils.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -16,28 +17,28 @@ int establecerConexion (){
     struct sockaddr_in servidor;
 
 
-      if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-          display("Error creant el socket\n");
-      } else {
-      }
+    if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+        display("Error creant el socket\n");
+    } else {
+    }
 
-      bzero(&servidor, sizeof(servidor));
-      servidor.sin_family = AF_INET;
-      servidor.sin_port = htons(8710);
+    bzero(&servidor, sizeof(servidor));
+    servidor.sin_family = AF_INET;
+    servidor.sin_port = htons(8710);
 
-      if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
-          display("Error configurant IP\n");
-      } else {
-      }
+    if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
+        display("Error configurant IP\n");
+    } else {
+    }
 
-      if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
-          display("Error fent el connect\n");
-      } else {
-      }
+    if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
+        display("Error fent el connect\n");
+    } else {
+    }
 
     return socketFD;
 
-  }
+}
 
 
 void comandosPropios(char **instruccion, int totalParams, int socketFD) {
@@ -61,7 +62,14 @@ void comandosPropios(char **instruccion, int totalParams, int socketFD) {
     if (strcmp("LOGIN", instruccion[0]) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
-            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+            // Test Sockets
+            char **paramList = NULL;
+            paramList = malloc((sizeof(char *)) * 3);
+            strcpy(paramList[0], "paco");
+            strcpy(paramList[1], "manolo");
+            strcpy(paramList[2], "frederico");
+
+            write(socketFD, paramList, sizeof(paramList));
 
             display("Missatge enviat!\n");
 
@@ -116,7 +124,7 @@ void pedirInstruccion() {
     while (1) {
 
         char entradaUsuario[40];
-
+        display("$ ");
         read(0, entradaUsuario, 40);
 
         entradaUsuario[strcspn(entradaUsuario, "\n") + 1] = '\0';

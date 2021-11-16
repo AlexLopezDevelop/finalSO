@@ -6,13 +6,15 @@
 #include <stdio.h>
 #include "funciones.h"
 
-void leerFichero(char *pathFile, ConfiguracionConfig *config) {
+int leerFichero(char *pathFile, ConfiguracionConfig *config) {
 
     int fd;
 
     fd = open(pathFile, O_RDONLY);
 
-    errorAbrir(fd, pathFile);
+    if (errorAbrir(fd, pathFile)) {
+        return 1;
+    }
 
     while (!checkEOF(fd)) {
         config->tiempoLimpieza = atoi(readLineFile(fd, '\n'));
@@ -22,15 +24,18 @@ void leerFichero(char *pathFile, ConfiguracionConfig *config) {
 
     }
 
+    return 0;
 }
 
-void leerFicheroArtreides(char *pathFile, ConfiguracionArtreides *configArtreides) {
+int leerFicheroArtreides(char *pathFile, ConfiguracionArtreides *configArtreides) {
 
     int fd;
 
     fd = open(pathFile, O_RDONLY);
 
-    errorAbrir(fd, pathFile);
+    if (errorAbrir(fd, pathFile)) {
+        return 1;
+    }
 
     while (!checkEOF(fd)) {
         strcpy(configArtreides->ip, readLineFile(fd, '\n'));
@@ -39,4 +44,5 @@ void leerFicheroArtreides(char *pathFile, ConfiguracionArtreides *configArtreide
 
     }
 
+    return 0;
 }

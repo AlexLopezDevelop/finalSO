@@ -17,7 +17,11 @@ int main(int argc, char *argv[]) {
 
     display("SERVIDOR ATREIDES\n");
 
-    leerFicheroArtreides(argv[1], &configAtreides);
+    if (leerFicheroArtreides(argv[1], &configAtreides)) {
+        return 1;
+    }
 
     gestorDeSockets();
+
+    return 0;
 }
