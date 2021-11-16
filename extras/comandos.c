@@ -11,7 +11,7 @@
 //#define PATH "/users/home/joan.ballber/finalSO-master"
 #define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
-int establecerConexion (){
+int establecerConexion() {
 
     int socketFD;
     struct sockaddr_in servidor;
@@ -41,25 +41,26 @@ int establecerConexion (){
 }
 
 
-void comandosPropios(char **instruccion, int totalParams, int socketFD) {
-    char cmd[20];
+int comandosPropios(char **instruccion, int totalParams, int socketFD) {
     int i = 0;
 
     display(instruccion[0]);
-    sprintf(cmd,"t: %d",totalParams);
-    display(cmd);
+
+    char comando[100] = "";
+    strcat(comando, instruccion[0]);
+
 
     // Pasar a mayusculas
-    while (instruccion[0][i] != '\0') {
-        if (instruccion[0][i] >= 'a' && instruccion[0][i] <= 'z') {
-            instruccion[0][i] = instruccion[0][i] - 32;
+    while (comando[i] != '\0') {
+        if (comando[i] >= 'a' && comando[i] <= 'z') {
+            comando[i] = comando[i] - 32;
         }
         i++;
     }
 
-    display(instruccion[0]);
 
-    if (strcmp("LOGIN", instruccion[0]) == 0) {
+
+    if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
             // Test Sockets
@@ -76,35 +77,35 @@ void comandosPropios(char **instruccion, int totalParams, int socketFD) {
         } else {
             display("Comanda KO. Falta paràmetres\n");
         }
-    } else if (strcmp("PHOTO", instruccion[0]) == 0) {
+    } else if (strcmp("PHOTO", comando) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+            write(socketFD, comando, sizeof(instruccion[0]));
 
             display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("SEARCH", instruccion[0]) == 0) {
+    } else if (strcmp("SEARCH", comando) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+            write(socketFD, comando, sizeof(instruccion[0]));
 
             display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("SEND", instruccion[0]) == 0) {
+    } else if (strcmp("SEND", comando) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            write(socketFD, instruccion[0], sizeof(instruccion[0]));
+            write(socketFD, comando, sizeof(instruccion[0]));
 
             display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("LOGOUT", instruccion[0]) == 0) {
-        if (strcmp("LOGOUT", instruccion[0]) == 0) {
+    } else if (strcmp("LOGOUT", comando) == 0) {
+        if (strcmp("LOGOUT", comando) == 0) {
             display("Comanda OK\n");
             write(socketFD, "salir", sizeof("salir"));
 
@@ -113,10 +114,10 @@ void comandosPropios(char **instruccion, int totalParams, int socketFD) {
             display("Comanda KO. Massa paràmetres\n");
         }
     } else {
-        display("No se ha encontrado el comando ");
-        display(instruccion[0]);
-        display("\n");
+        return 1;
     }
+
+    return 0;
 }
 
 void pedirInstruccion() {
@@ -187,10 +188,17 @@ void pedirInstruccion() {
             case 0:
                 // Hijo
                 display("------------------------------------------------------------\n");
-                if (execvp(paramList[0], paramList) == -1) {
-                    comandosPropios(paramList, totalParams - 1,socketFD);
-                    display("------------------------------------------------------------\n");
+
+                if (comandosPropios(paramList, totalParams - 1, socketFD)) {
+
+                    if (execvp(paramList[0], paramList) == -1) {
+                        display("No se ha encontrado el comando ");
+                        display(paramList[0]);
+                        display("\n");
+                    }
                 }
+
+                display("------------------------------------------------------------\n");
                 break;
             default:
                 // Padre
