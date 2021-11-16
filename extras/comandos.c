@@ -59,7 +59,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
     }
 
 
-
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
@@ -172,41 +171,36 @@ void pedirInstruccion() {
         // Añadir el NULL al final del params
         paramList[totalParams] = NULL;
 
+        if (comandosPropios(paramList, totalParams - 1, socketFD)) {
 
-        // Varables_locales
-        pid_t son_pid;
+            // init fork
+            pid_t son_pid;
+            son_pid = fork();
 
-
-        // Fork
-        son_pid = fork();
-
-        switch (son_pid) {
-            case -1:
-                // Error
-                display("Error en el fork!\n");
-                break;
-            case 0:
-                // Hijo
-                display("------------------------------------------------------------\n");
-
-                if (comandosPropios(paramList, totalParams - 1, socketFD)) {
+            switch (son_pid) {
+                case -1:
+                    // Error
+                    display("Error en el fork!\n");
+                    break;
+                case 0:
+                    // Hijo
+                    display("------------------------------------------------------------\n");
 
                     if (execvp(paramList[0], paramList) == -1) {
                         display("No se ha encontrado el comando ");
                         display(paramList[0]);
                         display("\n");
                     }
-                }
 
-                display("------------------------------------------------------------\n");
-                break;
-            default:
-                // Padre
-                wait(NULL);
-                display("------------------------------------------------------------\n");
-                break;
+                    display("------------------------------------------------------------\n");
+                    break;
+                default:
+                    // Padre
+                    wait(NULL);
+                    display("------------------------------------------------------------\n");
+                    break;
+            }
         }
-
         /*
         pid_t child_pid;
 
