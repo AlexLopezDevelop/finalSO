@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define MAX_TRAMA_SIZE 256
+
 //#define PATH "/users/home/joan.ballber/finalSO-master"
 #define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
 
@@ -40,6 +42,19 @@ int establecerConexion() {
 
 }
 
+char * obtenerTrama(char * tipo, char *data) {
+    char *trama = malloc(sizeof (char) * MAX_TRAMA_SIZE);
+
+    char * origen = rellenarFinalLinea("FREMEN", 15);
+    strcat(trama, origen);
+
+    strcat(trama, tipo);
+
+    char * dataAux = rellenarFinalLinea(data, 240);
+    strcat(trama, dataAux);
+
+    return trama;
+}
 
 int comandosPropios(char **instruccion, int totalParams, int socketFD) {
     int i = 0;
@@ -48,7 +63,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
 
     char comando[100] = "";
     strcat(comando, instruccion[0]);
-
 
     // Pasar a mayusculas
     while (comando[i] != '\0') {
@@ -62,14 +76,11 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
-            // Test Sockets
-            char **paramList = NULL;
-            paramList = malloc((sizeof(char *)) * 3);
-            strcpy(paramList[0], "paco");
-            strcpy(paramList[1], "manolo");
-            strcpy(paramList[2], "frederico");
 
-            write(socketFD, paramList, sizeof(paramList));
+            char * data = concatStringsPorAsterico(instruccion[2], instruccion[2]);
+            char * trama = obtenerTrama("C", data);
+
+            write(socketFD, trama, MAX_TRAMA_SIZE);
 
             display("Missatge enviat!\n");
 
@@ -149,7 +160,6 @@ void pedirInstruccion() {
             i++;
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
-
 
                 if (caracter == '\n') {
                     aux[strcspn(aux, "\n")] = 0;

@@ -37,6 +37,38 @@ char * readStringTo (char * string, char hasta) {
     return aux;
 }
 
+char * concatStringsPorAsterico(char * string1, char * string2) {
+    char * concatString = NULL;
+    int stringSize = strlen(string1) + strlen(string2) + 1;
+    concatString = malloc(stringSize * sizeof (char));
+
+    strcpy(concatString, string1);
+    strcat(concatString, "*");
+    strcat(concatString, string2);
+
+    return concatString;
+}
+
+char * rellenarFinalLinea(char * string, int numBytes) {
+    int sizeString = strlen(string);
+
+    if (sizeString >= numBytes) {
+        return string;
+    }
+
+    char * stringRelleno = NULL;
+    int numBytesRellenar = numBytes - sizeString;
+    stringRelleno = malloc(sizeof (char) * numBytes);
+
+    strcpy(stringRelleno, string);
+
+    for (int i = 0; i < numBytesRellenar; ++i) {
+        strcat(stringRelleno, "\0");
+    }
+
+    return stringRelleno;
+}
+
 int errorArgumentos(int argc, char *argv[], int num_argumentos) {
 
     if (argc != num_argumentos) {

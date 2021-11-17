@@ -52,4 +52,8 @@ void readInput(char **string);
 
 char * readStringTo (char * string, char hasta);
 
+char * rellenarFinalLinea(char * string, int numBytes);
+
+char * concatStringsPorAsterico(char * string1, char * string2);
+
 #endif //PRACTICAFINALSO_FUNCIONES_H

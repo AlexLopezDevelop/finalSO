@@ -4,6 +4,7 @@
 
 #include "utils.h"
 
+#define MAX_TRAMA_SIZE 256
 #define printF(x) write(1, x, strlen(x))
 
 int listenFD;
@@ -12,12 +13,10 @@ void * comprobarNombres(void *arg) {
     int clientFD = *(int *) arg;
     //int salir=0;
 
-    char **paramList = NULL;
-    paramList = malloc((sizeof(char *)) * 3);
+    char trama[MAX_TRAMA_SIZE];
+    read(clientFD, trama, MAX_TRAMA_SIZE);
 
-    read(clientFD, paramList, sizeof(paramList));
-
-    display(paramList[0]);
+    display(trama);
 
     /*char buffer[100];
     while (salir == 0) {
