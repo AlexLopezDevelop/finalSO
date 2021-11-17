@@ -90,6 +90,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
     } else if (strcmp("PHOTO", comando) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
+
             write(socketFD, comando, sizeof(instruccion[0]));
 
             display("Missatge enviat!\n");
@@ -99,7 +100,12 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
     } else if (strcmp("SEARCH", comando) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            write(socketFD, comando, sizeof(instruccion[0]));
+
+            // TODO: Cambiar por data real
+            char * data = "XaviC*22*08001";
+            char * trama = obtenerTrama("S", data);
+
+            write(socketFD, trama, MAX_TRAMA_SIZE);
 
             display("Missatge enviat!\n");
         } else {
