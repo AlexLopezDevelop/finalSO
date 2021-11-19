@@ -10,9 +10,6 @@
 
 #define MAX_TRAMA_SIZE 256
 
-//#define PATH "/users/home/joan.ballber/finalSO-master"
-#define PATH "/Users/alexlopez/Downloads/PracticaFinalSO"
-
 int establecerConexion() {
 
     int socketFD;
