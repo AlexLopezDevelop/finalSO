@@ -79,7 +79,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
 
             char * data = concatStringsPorAsterico(instruccion[2], instruccion[2]);
             char * trama = obtenerTrama("C", data);
-
+            display(trama);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
             display("Missatge enviat!\n");
@@ -104,6 +104,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
             // TODO: Cambiar por data real
             char * data = "XaviC*22*08001";
             char * trama = obtenerTrama("S", data);
+
 
             write(socketFD, trama, MAX_TRAMA_SIZE);
 

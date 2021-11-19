@@ -63,7 +63,7 @@ char * rellenarFinalLinea(char * string, int numBytes) {
     strcpy(stringRelleno, string);
 
     for (int i = 0; i < numBytesRellenar; ++i) {
-        strcat(stringRelleno, "\0");
+        strcat(stringRelleno, "\\0");
     }
 
     return stringRelleno;

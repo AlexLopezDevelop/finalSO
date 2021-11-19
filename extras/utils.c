@@ -16,7 +16,7 @@ void * comprobarNombres(void *arg) {
     char trama[MAX_TRAMA_SIZE];
     read(clientFD, trama, MAX_TRAMA_SIZE);
 
-    display(trama);
+    write(1,trama[15],1)
 
     /*char buffer[100];
     while (salir == 0) {
