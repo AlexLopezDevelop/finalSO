@@ -9,7 +9,7 @@ funciones.o: extras/funciones.c extras/funciones.h
 ficheros.o: extras/ficheros.c extras/ficheros.h extras/funciones.h
 		gcc -c extras/ficheros.c -Wall -Wextra
 
-comandos.o: extras/comandos.c extras/comandos.h
+comandos.o: extras/comandos.c extras/comandos.h modelos/configuracion.h
 		gcc -c extras/comandos.c -Wall -Wextra
 
 PracticaFinal: main.o funciones.o ficheros.o comandos.o

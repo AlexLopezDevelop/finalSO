@@ -9,10 +9,10 @@ funciones.o: ../extras/funciones.c ../extras/funciones.h
 ficheros.o: ../extras/ficheros.c ../extras/ficheros.h ../extras/funciones.h
 		gcc -c ../extras/ficheros.c -Wall -Wextra -lpthread
 
-comandos.o: ../extras/comandos.c ../extras/comandos.h
+comandos.o: ../extras/comandos.c ../extras/comandos.h ../modelos/configuracion.h
 		gcc -c ../extras/comandos.c -Wall -Wextra -lpthread
 
-utils.o: ../extras/utils.c ../extras/funciones.h ../extras/ficheros.h ../modelos/configuracion.h
+utils.o: ../extras/utils.c ../extras/funciones.h ../extras/ficheros.h ../modelos/configuracion.h ../modelos/conexion.h
 		gcc -c ../extras/utils.c -Wall -Wextra -lpthread
 
 Atreides: atreides.o funciones.o ficheros.o comandos.o utils.o

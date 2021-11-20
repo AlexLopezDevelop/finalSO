@@ -3,11 +3,42 @@
 //
 
 #include "utils.h"
+#include "../modelos/configuracion.h"
+#include "../modelos/conexion.h"
 
 #define MAX_TRAMA_SIZE 256
 #define printF(x) write(1, x, strlen(x))
 
 int listenFD;
+
+ConexionData * guardarTrama(char * trama) {
+    ConexionData * conexionData;
+    conexionData = malloc(sizeof (ConexionData));
+
+    // obtener origen
+    for (int i = 0; i < TRAMA_ORIGEN_SIZE; ++i) {
+        conexionData->origen[i] = trama[i];
+        if (trama[i] == '\0') {
+            break;
+        }
+    }
+
+    // obtener tipo
+    conexionData->tipo = trama[TRAMA_ORIGEN_SIZE];
+
+    // obtener data
+    int dataIndex = 0;
+
+    for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
+        conexionData->datos[dataIndex] = trama[i];
+        dataIndex++;
+        if (trama[i] == '\0') {
+            break;
+        }
+    }
+
+    return conexionData;
+}
 
 void *comprobarNombres(void *arg) {
     int clientFD = *(int *) arg;
@@ -16,7 +47,7 @@ void *comprobarNombres(void *arg) {
     char trama[MAX_TRAMA_SIZE];
     read(clientFD, trama, MAX_TRAMA_SIZE);
 
-    write(1, trama, MAX_TRAMA_SIZE);
+    guardarTrama(trama);
 
     /*char buffer[100];
     while (salir == 0) {

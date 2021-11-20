@@ -5,6 +5,10 @@
 #ifndef PRACTICAFINALSO_CONFIGURACION_H
 #define PRACTICAFINALSO_CONFIGURACION_H
 
+#define MAX_TRAMA_SIZE 256
+#define TRAMA_ORIGEN_SIZE 15
+#define TRAMA_DATA_SIZE 240
+
 typedef struct {
     int tiempoLimpieza;
     char ip[50];

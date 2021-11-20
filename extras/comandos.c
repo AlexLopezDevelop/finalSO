@@ -4,11 +4,9 @@
 
 #include "comandos.h"
 #include "funciones.h"
-#include <string.h>
+#include "../modelos/configuracion.h"
 
-#define MAX_TRAMA_SIZE 256
-#define TRAMA_ORIGEN_SIZE 15
-#define TRAMA_DATA_SIZE 240
+#include <string.h>
 
 int establecerConexion() {
 
@@ -47,6 +45,7 @@ char *crearTrama(char *origen, char tipo, char *data) {
     int tipoSize = 1;
     int dataSize = strlen(data);
 
+    // origen
     for (int i = 0; i < TRAMA_ORIGEN_SIZE; ++i) {
         if (i < origenSize) {
             trama[i] = origen[i];
@@ -55,8 +54,11 @@ char *crearTrama(char *origen, char tipo, char *data) {
         }
     }
 
+    // tipo
     trama[TRAMA_ORIGEN_SIZE] = tipo;
 
+
+    // data
     int dataIndex = 0;
 
     for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < TRAMA_DATA_SIZE; ++i) {
@@ -96,7 +98,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
         if (totalParams == 2) {
             display("Comanda OK\n");
 
-            char * data = concatStringsPorAsterico(instruccion[2], instruccion[2]);
+            char * data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
             char * trama = obtenerTrama('C', data);
             display(trama);
             write(socketFD, trama, MAX_TRAMA_SIZE);
