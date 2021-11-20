@@ -7,8 +7,6 @@
 
 #include "../modelos/configuracion.h"
 
-int leerFichero(char *pathFile, ConfiguracionConfig *config);
-
-int leerFicheroArtreides(char *pathFile, ConfiguracionArtreides *configArtreides);
+int leerFichero(char *pathFile, Configuracion *config);
 
 #endif //PRACTICAFINALSO_FICHEROS_H

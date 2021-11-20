@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
 
-    ConfiguracionConfig config;
+    Configuracion config;
 
     errorArgumentos(argc, argv, 2);
 

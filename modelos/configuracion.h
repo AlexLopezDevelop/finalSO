@@ -14,12 +14,6 @@ typedef struct {
     char ip[50];
     int puerto;
     char directorio[100];
-} ConfiguracionConfig;
-
-typedef struct {
-    char ip[50];
-    int puerto;
-    char directorio[100];
-} ConfiguracionArtreides;
+} Configuracion;
 
 #endif //PRACTICAFINALSO_CONFIGURACION_H
