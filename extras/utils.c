@@ -9,14 +9,14 @@
 
 int listenFD;
 
-void * comprobarNombres(void *arg) {
+void *comprobarNombres(void *arg) {
     int clientFD = *(int *) arg;
     //int salir=0;
 
     char trama[MAX_TRAMA_SIZE];
     read(clientFD, trama, MAX_TRAMA_SIZE);
 
-    write(1,trama[15],1)
+    write(1, trama, MAX_TRAMA_SIZE);
 
     /*char buffer[100];
     while (salir == 0) {
@@ -41,7 +41,7 @@ void * comprobarNombres(void *arg) {
     return NULL;
 }
 
-void salir(){
+void salir() {
     close(listenFD);
     signal(SIGINT, SIG_DFL);
     raise(SIGINT);
@@ -53,7 +53,7 @@ void gestorDeSockets() {
 
     signal(SIGINT, salir);
 
-    if( (listenFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0){
+    if ((listenFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
         printF("Error creant el socket\n");
     }
 
@@ -62,15 +62,15 @@ void gestorDeSockets() {
     servidor.sin_family = AF_INET;
     servidor.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if(bind(listenFD, (struct sockaddr*) &servidor, sizeof(servidor)) < 0){
+    if (bind(listenFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
         printF("Error fent el bind\n");
     }
 
-    if(listen(listenFD, 10) < 0){
+    if (listen(listenFD, 10) < 0) {
         printF("Error fent el listen\n");
     }
 
-    while(1) {
+    while (1) {
         printF("Esperant connexions...\n");
 
         clientFD = accept(listenFD, (struct sockaddr *) NULL, NULL);
@@ -78,7 +78,7 @@ void gestorDeSockets() {
         printF("\nNou client connectat!\n");
 
         pthread_t thrd;
-        printf("clientFD: %d\n",clientFD);
-        pthread_create(&thrd, NULL, comprobarNombres, (void*) &clientFD);
+        printf("clientFD: %d\n", clientFD);
+        pthread_create(&thrd, NULL, comprobarNombres, (void *) &clientFD);
     }
 }

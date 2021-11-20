@@ -4,11 +4,11 @@
 
 #include "comandos.h"
 #include "funciones.h"
-#include "utils.h"
 #include <string.h>
-#include <stdio.h>
 
 #define MAX_TRAMA_SIZE 256
+#define TRAMA_ORIGEN_SIZE 15
+#define TRAMA_DATA_SIZE 240
 
 int establecerConexion() {
 
@@ -39,18 +39,41 @@ int establecerConexion() {
 
 }
 
-char * obtenerTrama(char * tipo, char *data) {
-    char *trama = malloc(sizeof (char) * MAX_TRAMA_SIZE);
+char *crearTrama(char *origen, char tipo, char *data) {
+    char *trama = NULL;
+    trama = malloc(sizeof(char) * MAX_TRAMA_SIZE);
 
-    char * origen = rellenarFinalLinea("FREMEN", 15);
-    strcat(trama, origen);
+    int origenSize= strlen(origen);
+    int tipoSize = 1;
+    int dataSize = strlen(data);
 
-    strcat(trama, tipo);
+    for (int i = 0; i < TRAMA_ORIGEN_SIZE; ++i) {
+        if (i < origenSize) {
+            trama[i] = origen[i];
+        } else {
+            trama[i] = '\0';
+        }
+    }
 
-    char * dataAux = rellenarFinalLinea(data, 240);
-    strcat(trama, dataAux);
+    trama[TRAMA_ORIGEN_SIZE] = tipo;
+
+    int dataIndex = 0;
+
+    for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < TRAMA_DATA_SIZE; ++i) {
+        if (dataIndex < dataSize) {
+            trama[i] = data[dataIndex];
+            dataIndex++;
+        } else {
+            trama[i] = '\0';
+        }
+    }
+
 
     return trama;
+}
+
+char * obtenerTrama(char tipo, char *data) {
+    return crearTrama("FREMEN", tipo, data);
 }
 
 int comandosPropios(char **instruccion, int totalParams, int socketFD) {
@@ -69,13 +92,12 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
         i++;
     }
 
-
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             display("Comanda OK\n");
 
             char * data = concatStringsPorAsterico(instruccion[2], instruccion[2]);
-            char * trama = obtenerTrama("C", data);
+            char * trama = obtenerTrama('C', data);
             display(trama);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
@@ -100,7 +122,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
 
             // TODO: Cambiar por data real
             char * data = "XaviC*22*08001";
-            char * trama = obtenerTrama("S", data);
+            char * trama = obtenerTrama('S', data);
 
 
             write(socketFD, trama, MAX_TRAMA_SIZE);
