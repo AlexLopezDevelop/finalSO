@@ -36,6 +36,22 @@ int establecerConexion() {
     return socketFD;
 
 }
+int extraerIdTrama(char * tramaRespuesta) {
+    int idUSer;
+    int dataIndex = 0;
+    char * aux;
+    aux = malloc(sizeof(char)* TRAMA_DATA_SIZE);
+
+    for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
+        aux[dataIndex] = tramaRespuesta[i];
+        dataIndex++;
+        if (tramaRespuesta[i] == '\0') {
+            idUSer = atoi(aux);
+            break;
+        }
+    }
+    return idUSer;
+}
 
 char *crearTrama(char *origen, char tipo, char *data) {
     char *trama = NULL;
@@ -78,10 +94,9 @@ char * obtenerTrama(char tipo, char *data) {
     return crearTrama("FREMEN", tipo, data);
 }
 
-int comandosPropios(char **instruccion, int totalParams, int socketFD) {
+int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * usuario) {
     int i = 0;
-
-    display(instruccion[0]);
+    char print[200];
 
     char comando[100] = "";
     strcat(comando, instruccion[0]);
@@ -96,14 +111,28 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
 
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
-            display("Comanda OK\n");
 
             char * data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
             char * trama = obtenerTrama('C', data);
-            display(trama);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
-            display("Missatge enviat!\n");
+
+            char tramaRespuesta[MAX_TRAMA_SIZE];
+            read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+
+            if(tramaRespuesta[15] == 'O') {
+                //idUser
+                usuario->id = extraerIdTrama(tramaRespuesta);
+                //nombreUser
+                usuario->nombre = malloc(strlen(instruccion[1]));
+                strcpy(usuario->nombre,instruccion[1]);
+                //CodigoPostalUser
+                usuario->codigoPostal = malloc(strlen(instruccion[2]));
+                strcpy(usuario->codigoPostal,instruccion[2]);
+                sprintf(print,"Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n",usuario->nombre,usuario->id);
+                display(print);
+            }
+
 
         } else {
             display("Comanda KO. Falta paràmetres\n");
@@ -118,14 +147,13 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if (strcmp("SEARCH", comando) == 0) {
-        if (totalParams == 1) {
+    } else if ((strcmp("SEARCH", comando) == 0) ) {
+        if (totalParams == 1 ) {
             display("Comanda OK\n");
 
             // TODO: Cambiar por data real
-            char * data = "XaviC*22*08001";
+            char * data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id,instruccion[1]);
             char * trama = obtenerTrama('S', data);
-
 
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
@@ -160,6 +188,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD) {
 
 void pedirInstruccion() {
     int socketFD = establecerConexion();
+    Usuario * usuario = malloc(sizeof (Usuario));
     while (1) {
 
         char entradaUsuario[40];
@@ -209,7 +238,7 @@ void pedirInstruccion() {
         // Añadir el NULL al final del params
         paramList[totalParams] = NULL;
 
-        if (comandosPropios(paramList, totalParams - 1, socketFD)) {
+        if (comandosPropios(paramList, totalParams - 1, socketFD, usuario)) {
 
             // init fork
             pid_t son_pid;

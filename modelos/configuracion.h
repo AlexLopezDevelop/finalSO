@@ -16,4 +16,10 @@ typedef struct {
     char directorio[100];
 } Configuracion;
 
+typedef struct {
+    char * nombre;
+    char * codigoPostal;
+    int id;
+}Usuario;
+
 #endif //PRACTICAFINALSO_CONFIGURACION_H

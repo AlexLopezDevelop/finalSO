@@ -54,4 +54,6 @@ char * readStringTo (char * string, char hasta);
 
 char * concatStringsPorAsterico(char * string1, char * string2);
 
+char * concatStringsPorAstericoSearch(char * string1, int id, char * string3);
+
 #endif //PRACTICAFINALSO_FUNCIONES_H

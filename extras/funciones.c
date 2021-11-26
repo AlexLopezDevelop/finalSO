@@ -48,6 +48,21 @@ char * concatStringsPorAsterico(char * string1, char * string2) {
 
     return concatString;
 }
+char * concatStringsPorAstericoSearch(char * string1, int id, char * string3) {
+    char * concatString = NULL;
+    char aux[30];
+    sprintf(aux,"%d",id);
+    int stringSize = strlen(string1) + strlen(aux) + strlen(string3) + 1;
+    concatString = malloc(stringSize * sizeof (char));
+
+    strcpy(concatString, string1);
+    strcat(concatString, "*");
+    strcat(concatString, aux);
+    strcat(concatString, "*");
+    strcat(concatString, string3);
+
+    return concatString;
+}
 
 int errorArgumentos(int argc, char *argv[], int num_argumentos) {
 
