@@ -22,4 +22,9 @@ typedef struct {
     int id;
 }Usuario;
 
+typedef struct {
+    Usuario * usuarios;
+    int total;
+} ListadoUsuarios;
+
 #endif //PRACTICAFINALSO_CONFIGURACION_H

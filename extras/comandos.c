@@ -7,6 +7,7 @@
 #include "../modelos/configuracion.h"
 
 #include <string.h>
+#include <stdbool.h>
 
 int establecerConexion() {
 
@@ -94,6 +95,64 @@ char * obtenerTrama(char tipo, char *data) {
     return crearTrama("FREMEN", tipo, data);
 }
 
+
+ListadoUsuarios * destructTramaRespuesta(char * tramaRespuesta){
+    ListadoUsuarios *listadoUsuarios = malloc(sizeof (ListadoUsuarios));
+    char * dataTrama;
+    int dataIndex = 0;
+    char lineaFile[250];
+    bool isName = true;
+    int j=0;
+
+    dataTrama = malloc(sizeof (char)*TRAMA_DATA_SIZE);
+    for (int i = TRAMA_ORIGEN_SIZE+1; i < MAX_TRAMA_SIZE; ++i) {
+        dataTrama[dataIndex] = tramaRespuesta[i];
+        dataIndex++;
+    }
+    //total
+    strcpy(lineaFile,(readStringTo(dataTrama,'*')));
+    int sizeUsuarios = strlen(lineaFile) + 1;
+    listadoUsuarios->total = atoi(lineaFile);
+
+    //reservamos memoria con el total
+    listadoUsuarios->usuarios = realloc(listadoUsuarios->usuarios, sizeof(Usuario) * listadoUsuarios->total);
+  /*  listadoUsuarios->usuarios->nombre = malloc(sizeof (char));
+    for (int i = sizeUsuarios; i < TRAMA_DATA_SIZE; ++i) {
+        if (dataTrama[i] == '*' && isName == true) {
+            listadoUsuarios->usuarios[j].nombre[i] = '\0';
+            isName = false;
+        } else if (dataTrama[i] == '*' && isName == false){
+            listadoUsuarios->usuarios[j].codigoPostal[i] = '\0';
+            isName = true;
+            j++;
+        } else if(isName == false) {
+            listadoUsuarios->usuarios[j].codigoPostal[i] = dataTrama[i];
+
+        } else if(isName == true) {
+            listadoUsuarios->usuarios[j].nombre[i] = dataTrama[i];
+            listadoUsuarios->usuarios[j].nombre = realloc(listadoUsuarios->usuarios[j].nombre,sizeof (char) * cp);
+        }
+    }*/
+
+    for (int i = 0; i < listadoUsuarios->total; ++i) {
+        //guardamos nombre
+        strcpy(lineaFile, readStringTo(dataTrama,'*'));
+        listadoUsuarios->usuarios[i].nombre = malloc(strlen(lineaFile));
+        strcpy(listadoUsuarios->usuarios[i].nombre,lineaFile);
+        //si es el ultimo
+        if(i-1 == listadoUsuarios->total){
+            strcpy(lineaFile, readStringTo(dataTrama,'\0'));
+            listadoUsuarios->usuarios[i].id = atoi(lineaFile);
+            //guardamos el id
+        } else {
+            strcpy(lineaFile, readStringTo(dataTrama,'*'));
+            listadoUsuarios->usuarios[i].id = atoi(lineaFile);
+        }
+
+    }
+    return listadoUsuarios;
+}
+
 int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * usuario) {
     int i = 0;
     char print[200];
@@ -149,7 +208,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
         }
     } else if ((strcmp("SEARCH", comando) == 0) ) {
         if (totalParams == 1 ) {
-            display("Comanda OK\n");
 
             // TODO: Cambiar por data real
             char * data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id,instruccion[1]);
@@ -157,7 +215,27 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
 
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
-            display("Missatge enviat!\n");
+            char tramaRespuesta[MAX_TRAMA_SIZE];
+            read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+
+            if(tramaRespuesta[15] == 'L') {
+                char auxid[30];
+                ListadoUsuarios * listadoUsuarios = destructTramaRespuesta(tramaRespuesta);
+
+                sprintf(print, "Hi han %d persones humanes a %s\n", listadoUsuarios->total, instruccion[1]);
+                display(print);
+                display("\n");
+
+                for (int j = 0; j < listadoUsuarios->total; ++j) {
+                    sprintf(auxid,"%d",listadoUsuarios->usuarios[j].id);
+                    sprintf(print, "%s ", auxid);
+                    display(print);
+                    display(listadoUsuarios->usuarios[j].nombre);
+                    display("\n");
+                }
+            } else if(tramaRespuesta[15] == 'K') {
+                display("No hay ningun usuario con este codigo postal\n");
+            }
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
