@@ -48,6 +48,7 @@ char * concatStringsPorAsterico(char * string1, char * string2) {
 
     return concatString;
 }
+
 char * concatStringsPorAstericoSearch(char * string1, int id, char * string3) {
     char * concatString = NULL;
     char aux[30];

@@ -20,6 +20,7 @@ typedef struct {
     char * nombre;
     char * codigoPostal;
     int id;
+    int socketFD;
 }Usuario;
 
 typedef struct {

@@ -153,7 +153,7 @@ ListadoUsuarios * destructTramaRespuesta(char * tramaRespuesta){
     return listadoUsuarios;
 }
 
-int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * usuario) {
+int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * usuario) {
     int i = 0;
     char print[200];
 
@@ -170,7 +170,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
 
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
-
+            socketFD = establecerConexion();
             char * data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
             char * trama = obtenerTrama('C', data);
             write(socketFD, trama, MAX_TRAMA_SIZE);
@@ -190,6 +190,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
                 strcpy(usuario->codigoPostal,instruccion[2]);
                 sprintf(print,"Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n",usuario->nombre,usuario->id);
                 display(print);
+                usuario->socketFD = socketFD;
             }
 
 
@@ -200,7 +201,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
         if (totalParams == 1) {
             display("Comanda OK\n");
 
-            write(socketFD, comando, sizeof(instruccion[0]));
+            write(usuario->socketFD, comando, sizeof(instruccion[0]));
 
             display("Missatge enviat!\n");
         } else {
@@ -208,15 +209,15 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
         }
     } else if ((strcmp("SEARCH", comando) == 0) ) {
         if (totalParams == 1 ) {
-
+            if (usuario->socketFD > 0) {
             // TODO: Cambiar por data real
             char * data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id,instruccion[1]);
             char * trama = obtenerTrama('S', data);
 
-            write(socketFD, trama, MAX_TRAMA_SIZE);
+            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
             char tramaRespuesta[MAX_TRAMA_SIZE];
-            read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
             if(tramaRespuesta[15] == 'L') {
                 char auxid[30];
@@ -236,13 +237,16 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
             } else if(tramaRespuesta[15] == 'K') {
                 display("No hay ningun usuario con este codigo postal\n");
             }
+        } else{
+                display("Has de realizar el login primero\n");
+            }
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
         if (totalParams == 1) {
             display("Comanda OK\n");
-            write(socketFD, comando, sizeof(instruccion[0]));
+            write(usuario->socketFD, comando, sizeof(instruccion[0]));
 
             display("Missatge enviat!\n");
         } else {
@@ -250,10 +254,16 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD,Usuario * 
         }
     } else if (strcmp("LOGOUT", comando) == 0) {
         if (strcmp("LOGOUT", comando) == 0) {
-            display("Comanda OK\n");
-            write(socketFD, "salir", sizeof("salir"));
-
-            display("Missatge enviat!\n");
+            if (usuario->socketFD > 0) {
+                char userId[20];
+                sprintf(userId,"%d",usuario->id);
+                char *data = concatStringsPorAsterico(usuario->nombre, userId);
+                char *trama = obtenerTrama('Q', data);
+                write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                display("Desconectado de Atreides! Dew!\n");
+            }else{
+                display("Has de realizar el login primero\n");
+            }
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
