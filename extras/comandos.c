@@ -37,11 +37,12 @@ int establecerConexion() {
     return socketFD;
 
 }
-int extraerIdTrama(char * tramaRespuesta) {
+
+int extraerIdTrama(char *tramaRespuesta) {
     int idUSer;
     int dataIndex = 0;
-    char * aux;
-    aux = malloc(sizeof(char)* TRAMA_DATA_SIZE);
+    char *aux;
+    aux = malloc(sizeof(char) * TRAMA_DATA_SIZE);
 
     for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
         aux[dataIndex] = tramaRespuesta[i];
@@ -58,7 +59,7 @@ char *crearTrama(char *origen, char tipo, char *data) {
     char *trama = NULL;
     trama = malloc(sizeof(char) * MAX_TRAMA_SIZE);
 
-    int origenSize= strlen(origen);
+    int origenSize = strlen(origen);
     int tipoSize = 1;
     int dataSize = strlen(data);
 
@@ -91,65 +92,71 @@ char *crearTrama(char *origen, char tipo, char *data) {
     return trama;
 }
 
-char * obtenerTrama(char tipo, char *data) {
+char *obtenerTrama(char tipo, char *data) {
     return crearTrama("FREMEN", tipo, data);
 }
 
 
-ListadoUsuarios * destructTramaRespuesta(char * tramaRespuesta){
-    ListadoUsuarios *listadoUsuarios = malloc(sizeof (ListadoUsuarios));
-    char * dataTrama;
+ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
+    ListadoUsuarios *listadoUsuarios = malloc(sizeof(ListadoUsuarios));
+    char *dataTrama;
     int dataIndex = 0;
     char lineaFile[250];
-    bool isName = true;
-    int j=0;
 
-    dataTrama = malloc(sizeof (char)*TRAMA_DATA_SIZE);
-    for (int i = TRAMA_ORIGEN_SIZE+1; i < MAX_TRAMA_SIZE; ++i) {
+    dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
+    for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
         dataTrama[dataIndex] = tramaRespuesta[i];
         dataIndex++;
     }
+
     //total
-    strcpy(lineaFile,(readStringTo(dataTrama,'*')));
-    int sizeUsuarios = strlen(lineaFile) + 1;
+    strcpy(lineaFile, (readStringTo(dataTrama, '*')));
     listadoUsuarios->total = atoi(lineaFile);
 
     //reservamos memoria con el total
-    listadoUsuarios->usuarios = realloc(listadoUsuarios->usuarios, sizeof(Usuario) * listadoUsuarios->total);
-  /*  listadoUsuarios->usuarios->nombre = malloc(sizeof (char));
-    for (int i = sizeUsuarios; i < TRAMA_DATA_SIZE; ++i) {
-        if (dataTrama[i] == '*' && isName == true) {
-            listadoUsuarios->usuarios[j].nombre[i] = '\0';
-            isName = false;
-        } else if (dataTrama[i] == '*' && isName == false){
-            listadoUsuarios->usuarios[j].codigoPostal[i] = '\0';
-            isName = true;
-            j++;
-        } else if(isName == false) {
-            listadoUsuarios->usuarios[j].codigoPostal[i] = dataTrama[i];
+    listadoUsuarios->usuarios = malloc(sizeof(Usuario) * listadoUsuarios->total);
 
-        } else if(isName == true) {
-            listadoUsuarios->usuarios[j].nombre[i] = dataTrama[i];
-            listadoUsuarios->usuarios[j].nombre = realloc(listadoUsuarios->usuarios[j].nombre,sizeof (char) * cp);
-        }
-    }*/
+    // id
+    char * totalUsers = readStringTo(dataTrama,'*');
+    char *auxString = malloc(sizeof (char));
+    strcpy(auxString, "");
+    int tramaIndex = strlen(totalUsers) + 1;
+    int auxIndex = 0;
+    listadoUsuarios->total = atoi(totalUsers);
 
+    // usuarios
     for (int i = 0; i < listadoUsuarios->total; ++i) {
-        //guardamos nombre
-        strcpy(lineaFile, readStringTo(dataTrama,'*'));
-        listadoUsuarios->usuarios[i].nombre = malloc(strlen(lineaFile));
-        strcpy(listadoUsuarios->usuarios[i].nombre,lineaFile);
-        //si es el ultimo
-        if(i-1 == listadoUsuarios->total){
-            strcpy(lineaFile, readStringTo(dataTrama,'\0'));
-            listadoUsuarios->usuarios[i].id = atoi(lineaFile);
-            //guardamos el id
-        } else {
-            strcpy(lineaFile, readStringTo(dataTrama,'*'));
-            listadoUsuarios->usuarios[i].id = atoi(lineaFile);
+
+        // nombre
+        while (dataTrama[tramaIndex] != '*') {
+            auxString = realloc(auxString, sizeof (char) * auxIndex + 1);
+            auxString[auxIndex] = dataTrama[tramaIndex];
+            auxIndex++;
+            tramaIndex++;
         }
 
+        listadoUsuarios->usuarios[i].nombre = malloc(sizeof (char) * strlen(auxString));
+        strcpy(listadoUsuarios->usuarios[i].nombre, auxString);
+        auxString = NULL;
+        auxString = malloc(sizeof (char));
+        auxIndex = 0;
+        tramaIndex++;
+
+        // id
+        while (dataTrama[tramaIndex] != '*') {
+            auxString = realloc(auxString, sizeof (char) * auxIndex + 1);
+            auxString[auxIndex] = dataTrama[tramaIndex];
+            auxIndex++;
+            tramaIndex++;
+        }
+
+        listadoUsuarios->usuarios[i].id = atoi(auxString);
+        auxString = NULL;
+        auxString = malloc(sizeof (char));
+        auxIndex = 0;
+        tramaIndex++;
     }
+
     return listadoUsuarios;
 }
 
@@ -179,16 +186,17 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
-            if(tramaRespuesta[15] == 'O') {
+            if (tramaRespuesta[15] == 'O') {
                 //idUser
                 usuario->id = extraerIdTrama(tramaRespuesta);
                 //nombreUser
                 usuario->nombre = malloc(strlen(instruccion[1]));
-                strcpy(usuario->nombre,instruccion[1]);
+                strcpy(usuario->nombre, instruccion[1]);
                 //CodigoPostalUser
                 usuario->codigoPostal = malloc(strlen(instruccion[2]));
-                strcpy(usuario->codigoPostal,instruccion[2]);
-                sprintf(print,"Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n",usuario->nombre,usuario->id);
+                strcpy(usuario->codigoPostal, instruccion[2]);
+                sprintf(print, "Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n", usuario->nombre,
+                        usuario->id);
                 display(print);
                 usuario->socketFD = socketFD;
             }
@@ -211,30 +219,30 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
         if (totalParams == 1 ) {
             if (usuario->socketFD > 0) {
             // TODO: Cambiar por data real
-            char * data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id,instruccion[1]);
-            char * trama = obtenerTrama('S', data);
+            char *data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
+            char *trama = obtenerTrama('S', data);
 
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
-            if(tramaRespuesta[15] == 'L') {
+            if (tramaRespuesta[15] == 'L') {
                 char auxid[30];
-                ListadoUsuarios * listadoUsuarios = destructTramaRespuesta(tramaRespuesta);
+                ListadoUsuarios *listadoUsuarios = destructTramaRespuesta(tramaRespuesta);
 
                 sprintf(print, "Hi han %d persones humanes a %s\n", listadoUsuarios->total, instruccion[1]);
                 display(print);
                 display("\n");
 
                 for (int j = 0; j < listadoUsuarios->total; ++j) {
-                    sprintf(auxid,"%d",listadoUsuarios->usuarios[j].id);
+                    sprintf(auxid, "%d", listadoUsuarios->usuarios[j].id);
                     sprintf(print, "%s ", auxid);
                     display(print);
                     display(listadoUsuarios->usuarios[j].nombre);
                     display("\n");
                 }
-            } else if(tramaRespuesta[15] == 'K') {
+            } else if (tramaRespuesta[15] == 'K') {
                 display("No hay ningun usuario con este codigo postal\n");
             }
         } else{
@@ -276,7 +284,7 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
 
 void pedirInstruccion() {
     int socketFD;
-    Usuario * usuario = malloc(sizeof (Usuario));
+    Usuario *usuario = malloc(sizeof(Usuario));
     while (1) {
 
         char entradaUsuario[40];
