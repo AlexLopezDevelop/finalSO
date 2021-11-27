@@ -275,7 +275,7 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
 }
 
 void pedirInstruccion() {
-    int socketFD = establecerConexion();
+    int socketFD;
     Usuario * usuario = malloc(sizeof (Usuario));
     while (1) {
 
