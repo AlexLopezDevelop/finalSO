@@ -39,7 +39,7 @@ int establecerConexion() {
 }
 
 int extraerIdTrama(char *tramaRespuesta) {
-    int idUSer;
+    int idUSer = 0;
     int dataIndex = 0;
     char *aux;
     aux = malloc(sizeof(char) * TRAMA_DATA_SIZE);
