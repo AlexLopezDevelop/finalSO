@@ -25,4 +25,4 @@ val:
 		valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --track-fds=yes ./practicaFinal.exe Config.dat
 
 tar:
-		tar cf G5_F1.tar *.c extras/*.h extras/*.c modelos/*.h Config.dat makefile
+		tar cf G5_F2.tar *.c extras/*.h extras/*.c modelos/*.h Config.dat makefile Atreides/*.c Atreides/extras/*.c Atreides/extras/*.h Atreides/modelos/*.h Atreides/Config.dat Atreides/makefile Atreides/usuariosRegistrados.txt
