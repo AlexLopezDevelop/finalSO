@@ -117,34 +117,34 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     listadoUsuarios->usuarios = malloc(sizeof(Usuario) * listadoUsuarios->total);
 
     // id
-    char * totalUsers = readStringTo(dataTrama,'*');
-    char *auxString = malloc(sizeof (char));
+    char *totalUsers = readStringTo(dataTrama, '*');
+    char *auxString = malloc(sizeof(char));
     strcpy(auxString, "");
     int tramaIndex = strlen(totalUsers) + 1;
     int auxIndex = 0;
     listadoUsuarios->total = atoi(totalUsers);
 
     // usuarios
-    for (int i = 0; i < listadoUsuarios->total; ++i) {
+    for (int i = 0; i < listadoUsuarios->total - 1; ++i) {
 
         // nombre
         while (dataTrama[tramaIndex] != '*') {
-            auxString = realloc(auxString, sizeof (char) * auxIndex + 1);
+            auxString = realloc(auxString, sizeof(char) * auxIndex + 1);
             auxString[auxIndex] = dataTrama[tramaIndex];
             auxIndex++;
             tramaIndex++;
         }
 
-        listadoUsuarios->usuarios[i].nombre = malloc(sizeof (char) * strlen(auxString));
+        listadoUsuarios->usuarios[i].nombre = malloc(sizeof(char) * strlen(auxString));
         strcpy(listadoUsuarios->usuarios[i].nombre, auxString);
         auxString = NULL;
-        auxString = malloc(sizeof (char));
+        auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
 
         // id
         while (dataTrama[tramaIndex] != '*') {
-            auxString = realloc(auxString, sizeof (char) * auxIndex + 1);
+            auxString = realloc(auxString, sizeof(char) * auxIndex + 1);
             auxString[auxIndex] = dataTrama[tramaIndex];
             auxIndex++;
             tramaIndex++;
@@ -152,7 +152,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
 
         listadoUsuarios->usuarios[i].id = atoi(auxString);
         auxString = NULL;
-        auxString = malloc(sizeof (char));
+        auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
     }
@@ -160,7 +160,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     return listadoUsuarios;
 }
 
-int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * usuario) {
+int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *usuario) {
     int i = 0;
     char print[200];
 
@@ -178,8 +178,8 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             socketFD = establecerConexion();
-            char * data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
-            char * trama = obtenerTrama('C', data);
+            char *data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
+            char *trama = obtenerTrama('C', data);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
 
@@ -215,37 +215,40 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
-    } else if ((strcmp("SEARCH", comando) == 0) ) {
-        if (totalParams == 1 ) {
+    } else if ((strcmp("SEARCH", comando) == 0)) {
+        if (totalParams == 1) {
             if (usuario->socketFD > 0) {
-            // TODO: Cambiar por data real
-            char *data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
-            char *trama = obtenerTrama('S', data);
+                char *data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
+                char *trama = obtenerTrama('S', data);
 
-            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            char tramaRespuesta[MAX_TRAMA_SIZE];
-            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                char tramaRespuesta[MAX_TRAMA_SIZE];
+                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
-            if (tramaRespuesta[15] == 'L') {
-                char auxid[30];
-                ListadoUsuarios *listadoUsuarios = destructTramaRespuesta(tramaRespuesta);
+                if (tramaRespuesta[15] == 'L') {
+                    char auxid[30];
 
-                sprintf(print, "Hi han %d persones humanes a %s\n", listadoUsuarios->total, instruccion[1]);
-                display(print);
-                display("\n");
+                    ListadoUsuarios *listadoUsuarios = destructTramaRespuesta(tramaRespuesta);
 
-                for (int j = 0; j < listadoUsuarios->total; ++j) {
-                    sprintf(auxid, "%d", listadoUsuarios->usuarios[j].id);
-                    sprintf(print, "%s ", auxid);
-                    display(print);
-                    display(listadoUsuarios->usuarios[j].nombre);
                     display("\n");
+                    sprintf(print, "Hi han %d persones humanes a %s\n", listadoUsuarios->total, instruccion[1]);
+                    display(print);
+                    display("\n");
+
+                    for (int j = 0; j < listadoUsuarios->total; ++j) {
+                        sprintf(auxid, "%d", listadoUsuarios->usuarios[j].id);
+                        sprintf(print, "%s ", auxid);
+                        display(print);
+                        display(listadoUsuarios->usuarios[j].nombre);
+                        display("\n");
+                    }
+
+                    display("\n");
+                } else if (tramaRespuesta[15] == 'K') {
+                    display("No hay ningun usuario con este codigo postal\n");
                 }
-            } else if (tramaRespuesta[15] == 'K') {
-                display("No hay ningun usuario con este codigo postal\n");
-            }
-        } else{
+            } else {
                 display("Has de realizar el login primero\n");
             }
         } else {
@@ -264,12 +267,12 @@ int comandosPropios(char **instruccion, int totalParams,int socketFD ,Usuario * 
         if (strcmp("LOGOUT", comando) == 0) {
             if (usuario->socketFD > 0) {
                 char userId[20];
-                sprintf(userId,"%d",usuario->id);
+                sprintf(userId, "%d", usuario->id);
                 char *data = concatStringsPorAsterico(usuario->nombre, userId);
                 char *trama = obtenerTrama('Q', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
                 display("Desconectado de Atreides! Dew!\n");
-            }else{
+            } else {
                 display("Has de realizar el login primero\n");
             }
         } else {

@@ -104,7 +104,6 @@ void readInput(char **string) {
         // Lectura de caracter por caracter
         read(0, &caracter, sizeof(char));
 
-        // TODO: Revisar esta ðŸ’©
         // Redimensiona la cadena por cada caracter del usuario
         *string = (char *) realloc(*string, (sizeof(char) * (i + 1)));
 
