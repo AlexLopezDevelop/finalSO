@@ -236,7 +236,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                     display(print);
                     display("\n");
 
-                    for (int j = 0; j < listadoUsuarios->total; ++j) {
+                    for (int j = 0; j < listadoUsuarios->total - 1; ++j) {
                         sprintf(auxid, "%d", listadoUsuarios->usuarios[j].id);
                         sprintf(print, "%s ", auxid);
                         display(print);
