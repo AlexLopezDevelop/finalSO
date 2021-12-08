@@ -119,7 +119,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     // init
     char *auxString = malloc(sizeof(char));
     strcpy(auxString, "");
-    int tramaIndex = listadoUsuarios->total + 1;
+    int tramaIndex = listadoUsuarios->total;
     int auxIndex = 0;
 
     int sizeTrama = strlen(dataTrama);
