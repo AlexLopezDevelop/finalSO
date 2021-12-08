@@ -116,45 +116,58 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     //reservamos memoria con el total
     listadoUsuarios->usuarios = malloc(sizeof(Usuario) * listadoUsuarios->total);
 
-    // id
-    char *totalUsers = readStringTo(dataTrama, '*');
+    // init
     char *auxString = malloc(sizeof(char));
     strcpy(auxString, "");
-    int tramaIndex = strlen(totalUsers) + 1;
+    int tramaIndex = listadoUsuarios->total + 1;
     int auxIndex = 0;
-    listadoUsuarios->total = atoi(totalUsers);
+
+    int sizeTrama = strlen(dataTrama);
+    bool loopName = true;
+    bool loopId = true;
 
     // usuarios
-    for (int i = 0; i < listadoUsuarios->total - 1; ++i) {
+    for (int i = 0; i < listadoUsuarios->total; ++i) {
 
         // nombre
-        while (dataTrama[tramaIndex] != '*') {
+        while (loopName) {
             auxString = realloc(auxString, sizeof(char) * auxIndex + 1);
             auxString[auxIndex] = dataTrama[tramaIndex];
             auxIndex++;
             tramaIndex++;
+
+            if (dataTrama[tramaIndex] == '*' || dataTrama[tramaIndex] == '\0' || tramaIndex >= sizeTrama) {
+                loopName = false;
+            }
         }
 
         listadoUsuarios->usuarios[i].nombre = malloc(sizeof(char) * strlen(auxString));
         strcpy(listadoUsuarios->usuarios[i].nombre, auxString);
         auxString = NULL;
+        liberarMemoria(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
+        loopName = true;
 
         // id
-        while (dataTrama[tramaIndex] != '*') {
+        while (loopId) {
             auxString = realloc(auxString, sizeof(char) * auxIndex + 1);
             auxString[auxIndex] = dataTrama[tramaIndex];
             auxIndex++;
             tramaIndex++;
+            if (dataTrama[tramaIndex] == '*' || dataTrama[tramaIndex] == '\0' || tramaIndex >= sizeTrama) {
+                loopId = false;
+            }
         }
 
         listadoUsuarios->usuarios[i].id = atoi(auxString);
         auxString = NULL;
+        liberarMemoria(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
+        loopId = true;
     }
 
     return listadoUsuarios;
@@ -236,11 +249,11 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                     display(print);
                     display("\n");
 
-                    for (int j = 0; j < listadoUsuarios->total - 1; ++j) {
-                        sprintf(auxid, "%d", listadoUsuarios->usuarios[j].id);
+                    for (int j = 0; j < listadoUsuarios->total; ++j) {
+                        sprintf(auxid, "%d", listadoUsuarios->usuarios[0].id);
                         sprintf(print, "%s ", auxid);
                         display(print);
-                        display(listadoUsuarios->usuarios[j].nombre);
+                        display(listadoUsuarios->usuarios[0].nombre);
                         display("\n");
                     }
 
