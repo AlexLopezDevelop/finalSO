@@ -11,9 +11,9 @@
 
 typedef struct {
     int tiempoLimpieza;
-    char ip[50];
+    char * ip;
     int puerto;
-    char directorio[100];
+    char * directorio;
 } Configuracion;
 
 typedef struct {

@@ -5,6 +5,6 @@
 #ifndef PRACTICAFINALSO_COMANDOS_H
 #define PRACTICAFINALSO_COMANDOS_H
 
-void pedirInstruccion();
+_Noreturn void pedirInstruccion();
 
 #endif //PRACTICAFINALSO_COMANDOS_H

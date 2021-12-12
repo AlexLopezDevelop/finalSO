@@ -1,16 +1,16 @@
 all:PracticaFinal
 
 main.o: main.c extras/funciones.h extras/ficheros.h modelos/configuracion.h extras/comandos.h
-		gcc -c main.c -Wall -Wextra
+		gcc -c -g main.c -Wall -Wextra
 
 funciones.o: extras/funciones.c extras/funciones.h
-		gcc -c extras/funciones.c -Wall -Wextra
+		gcc -c -g extras/funciones.c -Wall -Wextra
 
 ficheros.o: extras/ficheros.c extras/ficheros.h extras/funciones.h
-		gcc -c extras/ficheros.c -Wall -Wextra
+		gcc -c -g extras/ficheros.c -Wall -Wextra
 
 comandos.o: extras/comandos.c extras/comandos.h modelos/configuracion.h
-		gcc -c extras/comandos.c -Wall -Wextra
+		gcc -c -g extras/comandos.c -Wall -Wextra
 
 PracticaFinal: main.o funciones.o ficheros.o comandos.o
 		gcc main.o funciones.o ficheros.o comandos.o -o practicaFinal.exe

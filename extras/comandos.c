@@ -22,7 +22,7 @@ int establecerConexion() {
 
     bzero(&servidor, sizeof(servidor));
     servidor.sin_family = AF_INET;
-    servidor.sin_port = htons(8710);
+    servidor.sin_port = htons(8755);
 
     if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
         display("Error configurant IP\n");
@@ -178,7 +178,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     char print[200];
 
     char comando[100] = "";
-    strcat(comando, instruccion[0]);
+    strcpy(comando, instruccion[0]);
 
     // Pasar a mayusculas
     while (comando[i] != '\0') {
@@ -298,33 +298,32 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     return 0;
 }
 
-void pedirInstruccion() {
+_Noreturn void pedirInstruccion() {
     int socketFD = -1;
     Usuario *usuario = malloc(sizeof(Usuario));
     while (1) {
 
         char entradaUsuario[40];
         display("$ ");
-        read(0, entradaUsuario, 40);
+        read(0, entradaUsuario, 300);
 
         entradaUsuario[strcspn(entradaUsuario, "\n") + 1] = '\0';
 
-        //char *param = NULL;
-        //char *param2 = NULL;
         int totalParams = 0;
 
         //  Separar instruccion y parametros
         int i = 0;
         char *aux = NULL;
         char caracter = '\0';
-        int lenEntradaUser = strlen(entradaUsuario);
+        int lenEntradaUser = sizeof(entradaUsuario);
         char **paramList = NULL;
-        paramList = malloc((sizeof(char *)) * totalParams);
+        paramList = (char **)malloc((sizeof(char *) * totalParams));
+        display("peta");
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];
 
-            aux = (char *) realloc(aux, i + 1);
+            aux = (char *)realloc(aux, (i + 1));
             aux[i] = caracter;
             i++;
 
@@ -334,24 +333,28 @@ void pedirInstruccion() {
                     aux[strcspn(aux, "\n")] = 0;
                 }
 
-                paramList[totalParams] = malloc(sizeof(char) * strlen(aux));
+                paramList[totalParams] = (char *) malloc(sizeof(char *) * strlen(aux) + 1);
+                display("peta3");
                 aux[strcspn(aux, " ")] = 0;
                 strcpy(paramList[totalParams], aux);
 
 
                 totalParams++;
+                paramList = realloc(paramList,sizeof (char) * totalParams);
                 aux = NULL;
                 liberarMemoria(aux);
                 i = 0;
             }
         }
+        display("peta2");
         // END Separar instruccion y parametros
 
+
         // Añadir el NULL al final del params
+        paramList = realloc(paramList,sizeof (char) * totalParams+1);
         paramList[totalParams] = NULL;
 
         if (comandosPropios(paramList, totalParams - 1, socketFD, usuario)) {
-
             // init fork
             pid_t son_pid;
             son_pid = fork();
@@ -375,10 +378,12 @@ void pedirInstruccion() {
                     break;
                 default:
                     // Padre
-                    wait(NULL);
+                    waitpid(son_pid,NULL,0);
                     display("------------------------------------------------------------\n");
+                    free(paramList);
                     break;
             }
         }
     }
+
 }
