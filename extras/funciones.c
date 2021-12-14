@@ -3,6 +3,8 @@
 //
 
 #include "funciones.h"
+#include "../modelos/configuracion.h"
+#include "comandos.h"
 
 void liberarMemoria(void *ptr) {
     // Libermaos Memoria
@@ -10,11 +12,12 @@ void liberarMemoria(void *ptr) {
     // Dejamos apuntando a NULL
     ptr = NULL;
 }
+
 void display(char *string) {
     write(1, string, sizeof(char) * strlen(string));
 }
 
-char * readStringTo (char * string, char hasta) {
+char *readStringTo(char *string, char hasta) {
     int i = 0;
     char *aux = NULL;
     char caracter = '\0';
@@ -37,10 +40,10 @@ char * readStringTo (char * string, char hasta) {
     return aux;
 }
 
-char * concatStringsPorAsterico(char * string1, char * string2) {
-    char * concatString = NULL;
+char *concatStringsPorAsterico(char *string1, char *string2) {
+    char *concatString = NULL;
     int stringSize = strlen(string1) + strlen(string2) + 1;
-    concatString = malloc(stringSize * sizeof (char));
+    concatString = malloc(stringSize * sizeof(char));
 
     strcpy(concatString, string1);
     strcat(concatString, "*");
@@ -49,12 +52,12 @@ char * concatStringsPorAsterico(char * string1, char * string2) {
     return concatString;
 }
 
-char * concatStringsPorAstericoSearch(char * string1, int id, char * string3) {
-    char * concatString = NULL;
+char *concatStringsPorAstericoSearch(char *string1, int id, char *string3) {
+    char *concatString = NULL;
     char aux[30];
-    sprintf(aux,"%d",id);
+    sprintf(aux, "%d", id);
     int stringSize = strlen(string1) + strlen(aux) + strlen(string3) + 1;
-    concatString = malloc(stringSize * sizeof (char));
+    concatString = malloc(stringSize * sizeof(char));
 
     strcpy(concatString, string1);
     strcat(concatString, "*");
@@ -121,13 +124,13 @@ void readInput(char **string) {
 char *readLineFile(int fd, char hasta) {
     int i = 0, size;
     char c = '\0';
-    char* string = (char*)malloc(sizeof(char));
+    char *string = (char *) malloc(sizeof(char));
 
     while (1) {
         size = read(fd, &c, sizeof(char));
 
         if (c != hasta && size > 0) {
-            string = (char*)realloc(string, sizeof(char) * (i + 2));
+            string = (char *) realloc(string, sizeof(char) * (i + 2));
             string[i++] = c;
         } else {
             break;
@@ -159,7 +162,7 @@ int checkEOF(int fd) {
     return 0;
 }
 
-int getFileSize(char * fileName) {
+int getFileSize(char *fileName) {
     struct stat sb;
 
     if (stat(fileName, &sb) == -1) {
@@ -170,4 +173,54 @@ int getFileSize(char * fileName) {
     return sb.st_size;
 }
 
+char *generateMd5sum(char *string) {
+    char *args[] = {"md5sum", string, 0};
+    int fd = open(MD5FILE, O_CREAT | O_WRONLY, S_IRWXU);
+    pid_t pid = fork();
+
+    if (!pid) {
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+        execvp(args[0], args);
+    }
+
+    fd = open(MD5FILE, O_RDONLY);
+
+    char *md5String = malloc(sizeof(char) * 33);
+
+    if (errorAbrir(fd, MD5FILE)) {
+        return md5String;
+    }
+
+    strcpy(md5String, readLineFile(fd, ' '));
+
+    close(fd);
+
+    return md5String;
+}
+
+int sendImage(int socket, char *fileName) {
+    FILE *picture;
+    char datosBinarios[TRAMA_DATA_SIZE];
+    char *trama;
+    picture = fopen(fileName, "r");
+
+    if (picture == NULL) {
+        display("Error Opening Image File");
+        return 1;
+    }
+
+    while (!feof(picture)) {
+        read(0, &datosBinarios, TRAMA_DATA_SIZE);
+        trama = obtenerTrama('D', datosBinarios);
+        display(datosBinarios);
+        display("\n");
+        write(socket, trama, MAX_TRAMA_SIZE);
+        display("Enviado al servidor");
+        display("\n");
+    }
+
+    display("Fin");
+    return 0;
+}
 

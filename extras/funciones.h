@@ -38,6 +38,7 @@
 
 
 #define FILE1 "Config.dat"
+#define MD5FILE "md5sum.txt"
 
 int errorArgumentos(int argc, char *argv[], int num_argumentos);
 
@@ -60,5 +61,9 @@ char * concatStringsPorAsterico(char * string1, char * string2);
 char * concatStringsPorAstericoSearch(char * string1, int id, char * string3);
 
 int getFileSize(char * fileName);
+
+char * generateMd5sum(char * string);
+
+int sendImage(int socket, char * fileName);
 
 #endif //PRACTICAFINALSO_FUNCIONES_H

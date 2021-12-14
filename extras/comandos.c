@@ -277,11 +277,15 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             int sizeFile = getFileSize(instruccion[1]);
             sprintf(sizeFileString, "%d", sizeFile);
 
+            char * md5File = generateMd5sum(instruccion[1]);
+
             char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
-            display(data);
-            //data = concatStringsPorAsterico(data, md5sum);
-            //char *trama = obtenerTrama('F', data);
-            //write(socketFD, trama, MAX_TRAMA_SIZE);
+            data = concatStringsPorAsterico(data, md5File);
+
+            char *trama = obtenerTrama('F', data);
+            write(socketFD, trama, MAX_TRAMA_SIZE);
+
+            sendImage(socketFD, "kenobi.jpg");
 
 
             // char tramaRespuesta[MAX_TRAMA_SIZE];

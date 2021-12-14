@@ -7,4 +7,6 @@
 
 _Noreturn void pedirInstruccion();
 
+char *obtenerTrama(char tipo, char *data);
+
 #endif //PRACTICAFINALSO_COMANDOS_H
