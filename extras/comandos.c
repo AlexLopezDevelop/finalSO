@@ -269,10 +269,23 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         }
     } else if (strcmp("SEND", comando) == 0) {
         if (totalParams == 1) {
-            display("Comanda OK\n");
-            write(usuario->socketFD, comando, sizeof(instruccion[0]));
+            // TODO: obtener tamaño
+            char sizeFileString[100];
+            // TODO: generar MD5SUM
+            //char * md5sum = NULL;
 
-            display("Missatge enviat!\n");
+            int sizeFile = getFileSize(instruccion[1]);
+            sprintf(sizeFileString, "%d", sizeFile);
+
+            char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
+            display(data);
+            //data = concatStringsPorAsterico(data, md5sum);
+            //char *trama = obtenerTrama('F', data);
+            //write(socketFD, trama, MAX_TRAMA_SIZE);
+
+
+            // char tramaRespuesta[MAX_TRAMA_SIZE];
+            // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
@@ -318,7 +331,6 @@ _Noreturn void pedirInstruccion() {
         int lenEntradaUser = sizeof(entradaUsuario);
         char **paramList = NULL;
         paramList = (char **)malloc((sizeof(char *) * totalParams));
-        display("peta");
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];
@@ -334,7 +346,6 @@ _Noreturn void pedirInstruccion() {
                 }
 
                 paramList[totalParams] = (char *) malloc(sizeof(char *) * strlen(aux) + 1);
-                display("peta3");
                 aux[strcspn(aux, " ")] = 0;
                 strcpy(paramList[totalParams], aux);
 
@@ -346,7 +357,6 @@ _Noreturn void pedirInstruccion() {
                 i = 0;
             }
         }
-        display("peta2");
         // END Separar instruccion y parametros
 
 

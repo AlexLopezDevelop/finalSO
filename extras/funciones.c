@@ -159,4 +159,15 @@ int checkEOF(int fd) {
     return 0;
 }
 
+int getFileSize(char * fileName) {
+    struct stat sb;
+
+    if (stat(fileName, &sb) == -1) {
+        perror("stat");
+        exit(EXIT_FAILURE);
+    }
+
+    return sb.st_size;
+}
+
 
