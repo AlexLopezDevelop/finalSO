@@ -209,9 +209,10 @@ int sendImage(int socket, char *fileName) {
         display("Error Opening Image File");
         return 1;
     }
-
     while (!feof(picture)) {
-        read(0, &datosBinarios, TRAMA_DATA_SIZE);
+        read(0, datosBinarios, TRAMA_DATA_SIZE);
+
+
         trama = obtenerTrama('D', datosBinarios);
         display(datosBinarios);
         display("\n");

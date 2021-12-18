@@ -220,7 +220,16 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         }
     } else if (strcmp("PHOTO", comando) == 0) {
         if (totalParams == 1) {
-            display("Comanda OK\n");
+            char* args[]={"md5sum",instruccion[1],0};
+            int fd=open("md5sum.txt",O_CREAT|O_WRONLY,S_IRWXU);
+            pid_t pid=fork();
+
+            if(!pid)
+            {
+                dup2(fd,STDOUT_FILENO);
+                close(fd);
+                execvp(args[0],args);
+            }
 
             write(usuario->socketFD, comando, sizeof(instruccion[0]));
 
@@ -283,9 +292,18 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             data = concatStringsPorAsterico(data, md5File);
 
             char *trama = obtenerTrama('F', data);
-            write(socketFD, trama, MAX_TRAMA_SIZE);
+            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            sendImage(socketFD, "kenobi.jpg");
+
+            char tramaRespuesta[MAX_TRAMA_SIZE];
+            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+            if (tramaRespuesta[15] == 'I'){
+                display("IMAGE OK\n");
+            } else if (tramaRespuesta[15] == 'R') {
+                display("IMAGE KO\n");
+            }
+
+            sendImage(usuario->socketFD, "kenobi.jpg");
 
 
             // char tramaRespuesta[MAX_TRAMA_SIZE];
