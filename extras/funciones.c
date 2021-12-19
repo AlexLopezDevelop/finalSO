@@ -175,7 +175,7 @@ int checkEOF(int fd) {
     return 0;
 }
 
-int getFileSize(char *fileName) {
+/*int getFileSize(char *fileName) {
     struct stat sb;
 
     if (stat(fileName, &sb) == -1) {
@@ -232,5 +232,5 @@ int sendImage(int socket, char *fileName) {
 
     display("Fin");
     return 0;
-}
+}*/
 
