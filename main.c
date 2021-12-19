@@ -23,7 +23,10 @@ int main(int argc, char *argv[]) {
 
     display("Benvingut a Fremen\n");
 
-    if (leerFichero(argv[1], &config)) {
+    char * fileName = malloc(strlen(argv[1]));
+    strcpy(fileName, argv[1]);
+
+    if (leerFichero(fileName, &config)) {
         return 1;
     }
 
