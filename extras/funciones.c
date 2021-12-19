@@ -144,6 +144,19 @@ char *readLineFile(int fd, char hasta) {
 
 }
 
+char *readLinePicture(int fd, int hasta) {
+    //int i = 0, size;
+    //char c = '\0';
+
+    char *string = (char *) malloc(sizeof(char) * hasta);
+
+    //while (1) {
+        read(fd, string, sizeof(char) * hasta);
+    //}
+
+    return string;
+}
+
 int checkEOF(int fd) {
     int num_bytes;
     char car;
@@ -200,26 +213,22 @@ char *generateMd5sum(char *string) {
 }
 
 int sendImage(int socket, char *fileName) {
-    FILE *picture;
-    char datosBinarios[TRAMA_DATA_SIZE];
-    char *trama;
-    picture = fopen(fileName, "r");
+    int picture;
+    char *datosBinarios;
+    picture = open(fileName, O_RDONLY);
 
-    if (picture == NULL) {
+    if (errorAbrir(picture, fileName)) {
         display("Error Opening Image File");
         return 1;
     }
-    while (!feof(picture)) {
-        read(0, datosBinarios, TRAMA_DATA_SIZE);
 
+    datosBinarios = readLinePicture(picture, TRAMA_DATA_SIZE);
 
-        trama = obtenerTrama('D', datosBinarios);
-        display(datosBinarios);
-        display("\n");
-        write(socket, trama, MAX_TRAMA_SIZE);
-        display("Enviado al servidor");
-        display("\n");
-    }
+    // send to server
+    char *trama = obtenerTrama('D', datosBinarios);
+    write(socket, trama, TRAMA_DATA_SIZE);
+
+    close(picture);
 
     display("Fin");
     return 0;

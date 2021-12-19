@@ -6,8 +6,8 @@
 Configuracion config;
 
 void salir() {
-    free(config.directorio);
-    free(config.ip);
+    //free(config.directorio);
+    //free(config.ip);
     //Valgrind muestra error de que hay Open file descriptor 1: /dev/pts/3  <inherited from parent>
     close(0);
     close(1);
@@ -17,8 +17,6 @@ void salir() {
 }
 
 int main(int argc, char *argv[]) {
-
-
     errorArgumentos(argc, argv, 2);
 
     display("Benvingut a Fremen\n");

@@ -294,7 +294,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             char *trama = obtenerTrama('F', data);
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
             if (tramaRespuesta[15] == 'I'){

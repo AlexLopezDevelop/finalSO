@@ -66,4 +66,6 @@ char * generateMd5sum(char * string);
 
 int sendImage(int socket, char * fileName);
 
+char * readLinePicture(int fd, int hasta);
+
 #endif //PRACTICAFINALSO_FUNCIONES_H
