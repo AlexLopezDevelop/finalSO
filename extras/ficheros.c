@@ -9,7 +9,6 @@
 int leerFichero(char *pathFile, Configuracion *config) {
 
     int fd;
-    char *lineaFile;
 
     fd = open(pathFile, O_RDONLY);
 
