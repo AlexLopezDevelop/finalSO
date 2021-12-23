@@ -20,11 +20,11 @@ int leerFichero(char *pathFile, Configuracion *config) {
     while (!checkEOF(fd)) {
         config->tiempoLimpieza = atoi(readLineFile(fd, '\n'));
         strcpy(lineaFile, readLineFile(fd, '\n'));
-        //config->ip = malloc(sizeof(char) * strlen(lineaFile) + 1);
+        config->ip = malloc(sizeof(char) * strlen(lineaFile) + 1);
         strcpy(config->ip, lineaFile);
         config->puerto = atoi(readLineFile(fd, '\n'));
         strcpy(lineaFile, readLineFile(fd, '\n'));
-        //config->directorio = malloc(sizeof(char) * strlen(lineaFile) + 1);
+        config->directorio = malloc(sizeof(char) * strlen(lineaFile) + 1);
         strcpy(config->directorio, lineaFile);
 
     }
