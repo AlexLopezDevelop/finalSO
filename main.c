@@ -33,5 +33,7 @@ int main(int argc, char *argv[]) {
 
     pedirInstruccion();
 
+    liberarMemoria(fileName);
+
     return 0;
 }

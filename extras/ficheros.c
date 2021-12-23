@@ -9,7 +9,7 @@
 int leerFichero(char *pathFile, Configuracion *config) {
 
     int fd;
-    char lineaFile[250];
+    char *lineaFile;
 
     fd = open(pathFile, O_RDONLY);
 
@@ -19,14 +19,9 @@ int leerFichero(char *pathFile, Configuracion *config) {
 
     while (!checkEOF(fd)) {
         config->tiempoLimpieza = atoi(readLineFile(fd, '\n'));
-        strcpy(lineaFile, readLineFile(fd, '\n'));
-        config->ip = malloc(sizeof(char) * strlen(lineaFile) + 1);
-        strcpy(config->ip, lineaFile);
+        config->ip = strdup(readLineFile(fd, '\n'));
         config->puerto = atoi(readLineFile(fd, '\n'));
-        strcpy(lineaFile, readLineFile(fd, '\n'));
-        config->directorio = malloc(sizeof(char) * strlen(lineaFile) + 1);
-        strcpy(config->directorio, lineaFile);
-
+        config->directorio = strdup(readLineFile(fd, '\n'));
     }
 
     close(fd);
