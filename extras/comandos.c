@@ -99,7 +99,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     ListadoUsuarios *listadoUsuarios = malloc(sizeof(ListadoUsuarios));
     char *dataTrama;
     int dataIndex = 0;
-    char lineaFile[250];
+    char * lineaFile;
 
     dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
     for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
@@ -108,9 +108,9 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     }
 
     //total
-    strcpy(lineaFile, (readStringTo(dataTrama, '*')));
+    lineaFile = strdup((readStringTo(dataTrama, '*')));
     listadoUsuarios->total = atoi(lineaFile);
-
+    free(lineaFile);
     //reservamos memoria con el total
     listadoUsuarios->usuarios = malloc(sizeof(Usuario) * listadoUsuarios->total);
 
@@ -120,7 +120,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     int tramaIndex = listadoUsuarios->total;
     int auxIndex = 0;
 
-    int sizeTrama = strlen(dataTrama);
+    int sizeTrama = strlen(dataTrama)+1;
     bool loopName = true;
     bool loopId = true;
 
@@ -129,20 +129,22 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
 
         // nombre
         while (loopName) {
-            auxString = realloc(auxString, sizeof(char) * auxIndex + 1);
+            auxString = realloc(auxString, sizeof(char) * (auxIndex + 1));
             auxString[auxIndex] = dataTrama[tramaIndex];
             auxIndex++;
             tramaIndex++;
 
+
             if (dataTrama[tramaIndex] == '*' || dataTrama[tramaIndex] == '\0' || tramaIndex >= sizeTrama) {
                 loopName = false;
+                auxString = realloc(auxString, sizeof(char) * (auxIndex + 1));
+                auxString[auxIndex] = '\0';
             }
         }
 
-        listadoUsuarios->usuarios[i].nombre = malloc(sizeof(char) * strlen(auxString));
-        strcpy(listadoUsuarios->usuarios[i].nombre, auxString);
-        auxString = NULL;
-        liberarMemoria(auxString);
+        listadoUsuarios->usuarios[i].nombre = strdup(auxString);
+
+        free(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
@@ -150,18 +152,20 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
 
         // id
         while (loopId) {
-            auxString = realloc(auxString, sizeof(char) * auxIndex + 1);
+            auxString = realloc(auxString, sizeof(char) * (auxIndex + 1));
             auxString[auxIndex] = dataTrama[tramaIndex];
             auxIndex++;
             tramaIndex++;
             if (dataTrama[tramaIndex] == '*' || dataTrama[tramaIndex] == '\0' || tramaIndex >= sizeTrama) {
                 loopId = false;
+                auxString = realloc(auxString, sizeof(char) * (auxIndex + 1));
+                auxString[auxIndex] = '\0';
             }
         }
 
         listadoUsuarios->usuarios[i].id = atoi(auxString);
-        auxString = NULL;
-        liberarMemoria(auxString);
+
+        free(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
@@ -206,7 +210,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 usuario->nombre = strdup(instruccion[1]);
                 //CodigoPostalUser
                 usuario->codigoPostal = strdup(instruccion[2]);
-                sprintf(print, "Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n", usuario->nombre,
+                sprintf(print, "Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n\n", usuario->nombre,
                         usuario->id);
                 display(print);
                 usuario->socketFD = socketFD;
@@ -236,7 +240,11 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     } else if ((strcmp("SEARCH", comando) == 0)) {
         if (totalParams == 1) {
             if (usuario->socketFD > 0) {
-                char *data = concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
+                char idString[20];
+                sprintf(idString,"%d",usuario->id);
+                char *data;
+                asprintf(&data , "%s*%s*%s", usuario->nombre,idString,instruccion[1]);
+                //concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
                 char *trama = obtenerTrama('S', data);
 
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
@@ -273,7 +281,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-        if (totalParams == 1) {
+       /* if (totalParams == 1) {
             // TODO: obtener tamaño
             char sizeFileString[100];
             // TODO: generar MD5SUM
@@ -297,7 +305,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                      } else if (tramaRespuesta[15] == 'R') {
                          display("IMAGE KO\n");
                      }
-         */
+
            // sendImage(usuario->socketFD, "kenobi.jpg");
 
 

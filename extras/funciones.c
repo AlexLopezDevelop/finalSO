@@ -18,25 +18,22 @@ void display(char *string) {
 }
 
 char *readStringTo(char *string, char hasta) {
+
     int i = 0;
-    char *aux = NULL;
+    char *aux = malloc(sizeof(char));
     char caracter = '\0';
 
     int lenString = strlen(string);
-    for (int j = 0; j < lenString || caracter != hasta; ++j) {
+    for (int j = 0; j < lenString || caracter != hasta; j++) {
         caracter = string[j];
-
         if (caracter != hasta) {
             aux = (char *) realloc(aux, i + 1);
             aux[i] = caracter;
             i++;
-        } else {
-            aux[j] = '\0';
-            return aux;
         }
 
     }
-
+    aux[i-1] = '\0';
     return aux;
 }
 
@@ -52,7 +49,7 @@ char *concatStringsPorAsterico(char *string1, char *string2) {
     return concatString;
 }
 
-char *concatStringsPorAstericoSearch(char *string1, int id, char *string3) {
+/*char *concatStringsPorAstericoSearch(char *string1, int id, char *string3) {
     char *concatString = NULL;
     char aux[30];
     sprintf(aux, "%d", id);
@@ -66,7 +63,7 @@ char *concatStringsPorAstericoSearch(char *string1, int id, char *string3) {
     strcat(concatString, string3);
 
     return concatString;
-}
+}*/
 
 int errorArgumentos(int argc, char *argv[], int num_argumentos) {
 
