@@ -64,7 +64,7 @@ char *crearTrama(char *origen, char tipo, char *data) {
     int dataSize = strlen(data);
 
     // origen
-    for (int i = 0; i < TRAMA_ORIGEN_SIZE; ++i) {
+    for (int i = 0; i < TRAMA_ORIGEN_SIZE; i++) {
         if (i < origenSize) {
             trama[i] = origen[i];
         } else {
@@ -75,11 +75,10 @@ char *crearTrama(char *origen, char tipo, char *data) {
     // tipo
     trama[TRAMA_ORIGEN_SIZE] = tipo;
 
-
     // data
     int dataIndex = 0;
 
-    for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < TRAMA_DATA_SIZE; ++i) {
+    for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < MAX_TRAMA_SIZE; i++) {
         if (dataIndex < dataSize) {
             trama[i] = data[dataIndex];
             dataIndex++;
@@ -87,7 +86,6 @@ char *crearTrama(char *origen, char tipo, char *data) {
             trama[i] = '\0';
         }
     }
-
 
     return trama;
 }
@@ -177,8 +175,8 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     int i = 0;
     char print[200];
 
-    char comando[100] = "";
-    strcpy(comando, instruccion[0]);
+    char *comando;
+    comando = strdup(instruccion[0]);
 
     // Pasar a mayusculas
     while (comando[i] != '\0') {
@@ -191,7 +189,9 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             socketFD = establecerConexion();
-            char *data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
+            //char *data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
+            char *data;
+            asprintf(&data , "%s*%s", instruccion[1], instruccion[2]);
             char *trama = obtenerTrama('C', data);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
@@ -203,11 +203,9 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 //idUser
                 usuario->id = extraerIdTrama(tramaRespuesta);
                 //nombreUser
-                usuario->nombre = malloc(strlen(instruccion[1]));
-                strcpy(usuario->nombre, instruccion[1]);
+                usuario->nombre = strdup(instruccion[1]);
                 //CodigoPostalUser
-                usuario->codigoPostal = malloc(strlen(instruccion[2]));
-                strcpy(usuario->codigoPostal, instruccion[2]);
+                usuario->codigoPostal = strdup(instruccion[2]);
                 sprintf(print, "Benvingut %s. Tens ID %d.\nAra estàs connectat a Atreides.\n", usuario->nombre,
                         usuario->id);
                 display(print);
@@ -220,15 +218,14 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         }
     } else if (strcmp("PHOTO", comando) == 0) {
         if (totalParams == 1) {
-            char* args[]={"md5sum",instruccion[1],0};
-            int fd=open("md5sum.txt",O_CREAT|O_WRONLY,S_IRWXU);
-            pid_t pid=fork();
+            char *args[] = {"md5sum", instruccion[1], 0};
+            int fd = open("md5sum.txt", O_CREAT | O_WRONLY, S_IRWXU);
+            pid_t pid = fork();
 
-            if(!pid)
-            {
-                dup2(fd,STDOUT_FILENO);
+            if (!pid) {
+                dup2(fd, STDOUT_FILENO);
                 close(fd);
-                execvp(args[0],args);
+                execvp(args[0], args);
             }
 
             write(usuario->socketFD, comando, sizeof(instruccion[0]));
@@ -277,7 +274,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-        if (totalParams == 1) {
+        /*if (totalParams == 1) {
             // TODO: obtener tamaño
             char sizeFileString[100];
             // TODO: generar MD5SUM
@@ -309,7 +306,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
         } else {
             display("Comanda KO. Massa paràmetres\n");
-        }
+        }*/
     } else if (strcmp("LOGOUT", comando) == 0) {
         if (strcmp("LOGOUT", comando) == 0) {
             if (usuario->socketFD > 0) {
@@ -347,45 +344,50 @@ _Noreturn void pedirInstruccion() {
 
         //  Separar instruccion y parametros
         int i = 0;
-        char *aux = NULL;
+        char *aux = malloc(sizeof(char));
         char caracter = '\0';
         int lenEntradaUser = sizeof(entradaUsuario);
         char **paramList = NULL;
-        paramList = (char **)malloc((sizeof(char *) * totalParams));
+        paramList = (char **) malloc((sizeof(char *)));
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];
 
-            aux = (char *)realloc(aux, (i + 1));
             aux[i] = caracter;
             i++;
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
 
-                if (caracter == '\n') {
-                    aux[strcspn(aux, "\n")] = 0;
-                }
+                aux[i - 1] = '\0';
 
-                paramList[totalParams] = (char *) malloc(sizeof(char *) * strlen(aux) + 1);
-                aux[strcspn(aux, " ")] = 0;
-                strcpy(paramList[totalParams], aux);
+                //aux[strlen(aux)-1] = '\0';
+                //paramList[totalParams] = (char *) malloc(sizeof(char) * (strlen(aux) + 1));
+                //aux[strcspn(aux, " ")] = 0;
+                //strcpy(paramList[totalParams], aux);
+                paramList[totalParams] = strdup(aux);
 
 
                 totalParams++;
-                paramList = realloc(paramList,sizeof (char) * totalParams);
-                aux = NULL;
-                liberarMemoria(aux);
+                paramList = realloc(paramList, sizeof(char *) * (totalParams + 1));
                 i = 0;
+                free(aux);
+                aux = malloc(sizeof(char));
+            } else {
+                aux = (char *) realloc(aux, (i + 1));
             }
         }
         // END Separar instruccion y parametros
 
 
         // Añadir el NULL al final del params
-        paramList = realloc(paramList,sizeof (char) * totalParams+1);
         paramList[totalParams] = NULL;
 
         if (comandosPropios(paramList, totalParams - 1, socketFD, usuario)) {
+
+            display("Comanmdo: ");
+            display(paramList[0]);
+            display("\n");
+
             // init fork
             pid_t son_pid;
             son_pid = fork();
@@ -409,7 +411,7 @@ _Noreturn void pedirInstruccion() {
                     break;
                 default:
                     // Padre
-                    waitpid(son_pid,NULL,0);
+                    waitpid(son_pid, NULL, 0);
                     display("------------------------------------------------------------\n");
                     free(paramList);
                     break;
