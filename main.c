@@ -24,7 +24,6 @@ int main(int argc, char *argv[]) {
     char * fileName;
     fileName = strdup(argv[1]);
 
-
     if (leerFichero(fileName, &config)) {
         return 1;
     }

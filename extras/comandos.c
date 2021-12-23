@@ -99,7 +99,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     ListadoUsuarios *listadoUsuarios = malloc(sizeof(ListadoUsuarios));
     char *dataTrama;
     int dataIndex = 0;
-    char * lineaFile;
+    char *lineaFile;
 
     dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
     for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
@@ -120,7 +120,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     int tramaIndex = listadoUsuarios->total;
     int auxIndex = 0;
 
-    int sizeTrama = strlen(dataTrama)+1;
+    int sizeTrama = strlen(dataTrama) + 1;
     bool loopName = true;
     bool loopId = true;
 
@@ -195,7 +195,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             socketFD = establecerConexion();
             //char *data = concatStringsPorAsterico(instruccion[1], instruccion[2]);
             char *data;
-            asprintf(&data , "%s*%s", instruccion[1], instruccion[2]);
+            asprintf(&data, "%s*%s", instruccion[1], instruccion[2]);
             char *trama = obtenerTrama('C', data);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
@@ -241,9 +241,9 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         if (totalParams == 1) {
             if (usuario->socketFD > 0) {
                 char idString[20];
-                sprintf(idString,"%d",usuario->id);
+                sprintf(idString, "%d", usuario->id);
                 char *data;
-                asprintf(&data , "%s*%s*%s", usuario->nombre,idString,instruccion[1]);
+                asprintf(&data, "%s*%s*%s", usuario->nombre, idString, instruccion[1]);
                 //concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
                 char *trama = obtenerTrama('S', data);
 
@@ -281,39 +281,39 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-       /* if (totalParams == 1) {
-            // TODO: obtener tamaño
-            char sizeFileString[100];
-            // TODO: generar MD5SUM
-            //char * md5sum = NULL;
+        /* if (totalParams == 1) {
+             // TODO: obtener tamaño
+             char sizeFileString[100];
+             // TODO: generar MD5SUM
+             //char * md5sum = NULL;
 
-                     int sizeFile = getFileSize(instruccion[1]);
-                     sprintf(sizeFileString, "%d", sizeFile);
+                      int sizeFile = getFileSize(instruccion[1]);
+                      sprintf(sizeFileString, "%d", sizeFile);
 
-                     char * md5File = generateMd5sum(instruccion[1]);
+                      char * md5File = generateMd5sum(instruccion[1]);
 
-                     char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
-                     data = concatStringsPorAsterico(data, md5File);
+                      char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
+                      data = concatStringsPorAsterico(data, md5File);
 
-                     char *trama = obtenerTrama('F', data);
-                     write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                      char *trama = obtenerTrama('F', data);
+                      write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-                     char tramaRespuesta[MAX_TRAMA_SIZE];
-                     read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-                     if (tramaRespuesta[15] == 'I'){
-                         display("IMAGE OK\n");
-                     } else if (tramaRespuesta[15] == 'R') {
-                         display("IMAGE KO\n");
-                     }
+                      char tramaRespuesta[MAX_TRAMA_SIZE];
+                      read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                      if (tramaRespuesta[15] == 'I'){
+                          display("IMAGE OK\n");
+                      } else if (tramaRespuesta[15] == 'R') {
+                          display("IMAGE KO\n");
+                      }
 
-           // sendImage(usuario->socketFD, "kenobi.jpg");
+            // sendImage(usuario->socketFD, "kenobi.jpg");
 
 
-            // char tramaRespuesta[MAX_TRAMA_SIZE];
-            // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-        } else {
-            display("Comanda KO. Massa paràmetres\n");
-        }*/
+             // char tramaRespuesta[MAX_TRAMA_SIZE];
+             // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+         } else {
+             display("Comanda KO. Massa paràmetres\n");
+         }*/
     } else if (strcmp("LOGOUT", comando) == 0) {
         if (strcmp("LOGOUT", comando) == 0) {
             if (usuario->socketFD > 0) {
@@ -359,32 +359,26 @@ _Noreturn void pedirInstruccion() {
 
         for (int j = 0; j < lenEntradaUser && caracter != '\n'; ++j) {
             caracter = entradaUsuario[j];
-
             aux[i] = caracter;
             i++;
 
             if (caracter == ' ' || caracter == '|' || caracter == '\n') {
 
                 aux[i - 1] = '\0';
-
-                //aux[strlen(aux)-1] = '\0';
-                //paramList[totalParams] = (char *) malloc(sizeof(char) * (strlen(aux) + 1));
-                //aux[strcspn(aux, " ")] = 0;
-                //strcpy(paramList[totalParams], aux);
                 paramList[totalParams] = strdup(aux);
-
 
                 totalParams++;
                 paramList = realloc(paramList, sizeof(char *) * (totalParams + 1));
                 i = 0;
-                free(aux);
+                liberarMemoria(aux);
                 aux = malloc(sizeof(char));
             } else {
                 aux = (char *) realloc(aux, (i + 1));
             }
         }
-        // END Separar instruccion y parametros
 
+        liberarMemoria(aux);
+        // END Separar instruccion y parametros
 
         // Añadir el NULL al final del params
         paramList[totalParams] = NULL;
@@ -400,12 +394,10 @@ _Noreturn void pedirInstruccion() {
             son_pid = fork();
 
             switch (son_pid) {
-                case -1:
-                    // Error
+                case -1: // Error
                     display("Error en el fork!\n");
                     break;
-                case 0:
-                    // Hijo
+                case 0: // Hijo
                     display("------------------------------------------------------------\n");
 
                     if (execvp(paramList[0], paramList) == -1) {
@@ -416,14 +408,19 @@ _Noreturn void pedirInstruccion() {
 
                     display("------------------------------------------------------------\n");
                     break;
-                default:
-                    // Padre
+                default: // Padre
                     waitpid(son_pid, NULL, 0);
                     display("------------------------------------------------------------\n");
-                    free(paramList);
+                    for (int j = 0; j < totalParams; j++) {
+                        liberarMemoria(paramList[j]);
+                    }
+                    liberarMemoria(paramList);
+                    liberarMemoria(aux);
+                    liberarMemoria(usuario->nombre);
+                    liberarMemoria(usuario->codigoPostal);
+                    liberarMemoria(usuario);
                     break;
             }
         }
     }
-
 }
