@@ -212,7 +212,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 usuario->socketFD = socketFD;
             }
 
-
         } else {
             display("Comanda KO. Falta paràmetres\n");
         }
@@ -274,7 +273,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-        /*if (totalParams == 1) {
+        if (totalParams == 1) {
             // TODO: obtener tamaño
             char sizeFileString[100];
             // TODO: generar MD5SUM
