@@ -34,7 +34,7 @@ char *readStringTo(char *string, char hasta) {
         }
 
     }
-    aux[i-1] = '\0';
+    aux[i - 1] = '\0';
     return aux;
 }
 
@@ -210,22 +210,26 @@ int sendImage(int socket, char *fileName) {
     //datosBinarios = readLinePicture(picture, TRAMA_DATA_SIZE);
     FicheroFoto *ficheroFoto;
     ficheroFoto->totalTramas = 0;
-    ficheroFoto->tramas = malloc(sizeof (char *));
+    ficheroFoto->tramas = malloc(sizeof(char *));
+    ficheroFoto->tramas[0] = malloc(sizeof(char));
 
-    int i = 0, size;
+    int i = 0;
     char c = '\0';
-    char *string = (char *) malloc(sizeof(char));
 
     while (!checkEOF(picture)) {
-        size = read(picture, &c, sizeof(char));
+        read(picture, &c, sizeof(char));
+
+        ficheroFoto->tramas[ficheroFoto->totalTramas][i] = c;
 
         if (i == TRAMA_DATA_SIZE) {
             ficheroFoto->totalTramas++;
-            ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * ficheroFoto->totalTramas);
-            ficheroFoto->tramas[ficheroFoto->totalTramas-1] = strdup(string);
+            ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * (ficheroFoto->totalTramas + 1));
+            ficheroFoto->tramas[ficheroFoto->totalTramas] = malloc(sizeof(char));
+            i = 0;
         }
 
         i++;
+        ficheroFoto->tramas[ficheroFoto->totalTramas] = realloc(ficheroFoto->tramas[ficheroFoto->totalTramas], sizeof(char) * (i + 1));
     }
 
     close(picture);

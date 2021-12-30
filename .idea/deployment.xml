@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="Remote Host (6da4d986-de20-423c-9fb5-06833462f056)" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="LaSalle" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="Remote Host (6da4d986-de20-423c-9fb5-06833462f056)">
+      <paths name="LaSalle">
         <serverdata>
           <mappings>
             <mapping deploy="/finalSO" local="$PROJECT_DIR$" web="/" />

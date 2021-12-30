@@ -282,38 +282,38 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         }
     } else if (strcmp("SEND", comando) == 0) {
         if (totalParams == 1) {
-             // TODO: obtener tamaño
-             char sizeFileString[100];
-             // TODO: generar MD5SUM
-             //char * md5sum = NULL;
+            // TODO: obtener tamaño
+            char sizeFileString[100];
+            // TODO: generar MD5SUM
+            //char * md5sum = NULL;
 
-                      int sizeFile = getFileSize(instruccion[1]);
-                      sprintf(sizeFileString, "%d", sizeFile);
+            int sizeFile = getFileSize(instruccion[1]);
+            sprintf(sizeFileString, "%d", sizeFile);
 
-                      char * md5File = generateMd5sum(instruccion[1]);
+            char *md5File = generateMd5sum(instruccion[1]);
 
-                      char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
-                      data = concatStringsPorAsterico(data, md5File);
+            char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
+            data = concatStringsPorAsterico(data, md5File);
 
-                      char *trama = obtenerTrama('F', data);
-                      write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+            char *trama = obtenerTrama('F', data);
+            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-                      char tramaRespuesta[MAX_TRAMA_SIZE];
-                      read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-                      if (tramaRespuesta[15] == 'I'){
-                          display("IMAGE OK\n");
-                      } else if (tramaRespuesta[15] == 'R') {
-                          display("IMAGE KO\n");
-                      }
+            char tramaRespuesta[MAX_TRAMA_SIZE];
+            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+            if (tramaRespuesta[15] == 'I') {
+                display("IMAGE OK\n");
+            } else if (tramaRespuesta[15] == 'R') {
+                display("IMAGE KO\n");
+            }
 
             sendImage(usuario->socketFD, "kenobi.jpg");
 
 
-             // char tramaRespuesta[MAX_TRAMA_SIZE];
-             // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-         } else {
-             display("Comanda KO. Massa paràmetres\n");
-         }
+            // char tramaRespuesta[MAX_TRAMA_SIZE];
+            // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+        } else {
+            display("Comanda KO. Massa paràmetres\n");
+        }
     } else if (strcmp("LOGOUT", comando) == 0) {
         if (strcmp("LOGOUT", comando) == 0) {
             if (usuario->socketFD > 0) {
