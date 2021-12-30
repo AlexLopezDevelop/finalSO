@@ -27,3 +27,31 @@ int leerFichero(char *pathFile, Configuracion *config) {
 
     return 0;
 }
+
+
+/*
+ *
+ *char *readLineFile(int fd, char hasta) {
+    int i = 0, size;
+    char c = '\0';
+    char *string = (char *) malloc(sizeof(char));
+
+    while (1) {
+        size = read(fd, &c, sizeof(char));
+
+        if (c != hasta && size > 0) {
+            string = (char *) realloc(string, sizeof(char) * (i + 2));
+            string[i++] = c;
+        } else {
+            break;
+        }
+
+    }
+
+    string[i] = '\0';
+
+    return string;
+
+}
+ *
+ */

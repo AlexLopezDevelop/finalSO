@@ -281,7 +281,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             display("Comanda KO. Massa paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-        /* if (totalParams == 1) {
+        if (totalParams == 1) {
              // TODO: obtener tamaño
              char sizeFileString[100];
              // TODO: generar MD5SUM
@@ -306,14 +306,14 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                           display("IMAGE KO\n");
                       }
 
-            // sendImage(usuario->socketFD, "kenobi.jpg");
+            sendImage(usuario->socketFD, "kenobi.jpg");
 
 
              // char tramaRespuesta[MAX_TRAMA_SIZE];
              // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
          } else {
              display("Comanda KO. Massa paràmetres\n");
-         }*/
+         }
     } else if (strcmp("LOGOUT", comando) == 0) {
         if (strcmp("LOGOUT", comando) == 0) {
             if (usuario->socketFD > 0) {

@@ -5,6 +5,7 @@
 #include "funciones.h"
 #include "../modelos/configuracion.h"
 #include "comandos.h"
+#include "../modelos/ficheros.h"
 
 void liberarMemoria(void *ptr) {
     // Libermaos Memoria
@@ -141,19 +142,6 @@ char *readLineFile(int fd, char hasta) {
 
 }
 
-char *readLinePicture(int fd, int hasta) {
-    //int i = 0, size;
-    //char c = '\0';
-
-    char *string = (char *) malloc(sizeof(char) * hasta);
-
-    //while (1) {
-        read(fd, string, sizeof(char) * hasta);
-    //}
-
-    return string;
-}
-
 int checkEOF(int fd) {
     int num_bytes;
     char car;
@@ -172,7 +160,7 @@ int checkEOF(int fd) {
     return 0;
 }
 
-/*int getFileSize(char *fileName) {
+int getFileSize(char *fileName) {
     struct stat sb;
 
     if (stat(fileName, &sb) == -1) {
@@ -219,7 +207,28 @@ int sendImage(int socket, char *fileName) {
         return 1;
     }
 
-    datosBinarios = readLinePicture(picture, TRAMA_DATA_SIZE);
+    //datosBinarios = readLinePicture(picture, TRAMA_DATA_SIZE);
+    FicheroFoto *ficheroFoto;
+    ficheroFoto->totalTramas = 0;
+    ficheroFoto->tramas = malloc(sizeof (char *));
+
+    int i = 0, size;
+    char c = '\0';
+    char *string = (char *) malloc(sizeof(char));
+
+    while (!checkEOF(picture)) {
+        size = read(picture, &c, sizeof(char));
+
+        if (i == TRAMA_DATA_SIZE) {
+            ficheroFoto->totalTramas++;
+            ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * ficheroFoto->totalTramas);
+            ficheroFoto->tramas[ficheroFoto->totalTramas-1] = strdup(string);
+        }
+
+        i++;
+    }
+
+    close(picture);
 
     // send to server
     char *trama = obtenerTrama('D', datosBinarios);
@@ -229,5 +238,5 @@ int sendImage(int socket, char *fileName) {
 
     display("Fin");
     return 0;
-}*/
+}
 
