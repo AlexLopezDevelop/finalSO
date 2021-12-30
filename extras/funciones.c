@@ -207,8 +207,7 @@ int sendImage(int socket, char *fileName) {
         return 1;
     }
 
-    //datosBinarios = readLinePicture(picture, TRAMA_DATA_SIZE);
-    FicheroFoto *ficheroFoto;
+    FicheroFoto *ficheroFoto = malloc(sizeof(FicheroFoto));
     ficheroFoto->totalTramas = 0;
     ficheroFoto->tramas = malloc(sizeof(char *));
     ficheroFoto->tramas[0] = malloc(sizeof(char));
@@ -226,21 +225,24 @@ int sendImage(int socket, char *fileName) {
             ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * (ficheroFoto->totalTramas + 1));
             ficheroFoto->tramas[ficheroFoto->totalTramas] = malloc(sizeof(char));
             i = 0;
+        } else {
+            i++;
         }
 
-        i++;
-        ficheroFoto->tramas[ficheroFoto->totalTramas] = realloc(ficheroFoto->tramas[ficheroFoto->totalTramas], sizeof(char) * (i + 1));
+        ficheroFoto->tramas[ficheroFoto->totalTramas] = realloc(ficheroFoto->tramas[ficheroFoto->totalTramas],sizeof(char) * (i + 1));
     }
+
+    ficheroFoto->totalTramas++;
 
     close(picture);
 
     // send to server
-    char *trama = obtenerTrama('D', datosBinarios);
-    write(socket, trama, TRAMA_DATA_SIZE);
+    for (int j = 0; j < ficheroFoto->totalTramas; j++) {
+        char *trama = obtenerTrama('D', ficheroFoto->tramas[j]);
+        write(socket, trama, TRAMA_DATA_SIZE);
+    }
 
-    close(picture);
-
-    display("Fin");
+    display("Foto Enviada");
     return 0;
 }
 
