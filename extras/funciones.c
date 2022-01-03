@@ -212,23 +212,18 @@ int sendImage(int socket, char *fileName) {
     ficheroFoto->tramas = malloc(sizeof(char *));
     ficheroFoto->tramas[0] = malloc(sizeof(char));
 
-    int i = 0;
-    char c = '\0';
+    char c[TRAMA_DATA_SIZE];
 
     while (!checkEOF(picture)) {
-        read(picture, &c, sizeof(char));
+        read(picture, &c, sizeof(char) * TRAMA_DATA_SIZE);
 
-        ficheroFoto->tramas[ficheroFoto->totalTramas] = realloc(ficheroFoto->tramas[ficheroFoto->totalTramas],sizeof(char) * (i + 1));
-        ficheroFoto->tramas[ficheroFoto->totalTramas][i] = c;
+        ficheroFoto->tramas[ficheroFoto->totalTramas] = realloc(ficheroFoto->tramas[ficheroFoto->totalTramas],sizeof(char) * TRAMA_DATA_SIZE);
+        ficheroFoto->tramas[ficheroFoto->totalTramas] = strdup(c);
 
-        if (i == (TRAMA_DATA_SIZE-1)) {
-            ficheroFoto->totalTramas++;
-            ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * (ficheroFoto->totalTramas + 1));
-            ficheroFoto->tramas[ficheroFoto->totalTramas] = malloc(sizeof(char));
-            i = 0;
-        } else {
-            i++;
-        }
+        ficheroFoto->totalTramas++;
+        ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * (ficheroFoto->totalTramas + 1));
+        ficheroFoto->tramas[ficheroFoto->totalTramas] = malloc(sizeof(char));
+
     }
 
     ficheroFoto->totalTramas++;
@@ -248,4 +243,3 @@ int sendImage(int socket, char *fileName) {
     display("Foto Enviada");
     return 0;
 }
-
