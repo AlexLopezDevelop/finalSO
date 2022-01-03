@@ -59,9 +59,8 @@ char *crearTrama(char *origen, char tipo, char *data) {
     char *trama = NULL;
     trama = malloc(sizeof(char) * MAX_TRAMA_SIZE);
 
-    int origenSize = strlen(origen);
     int tipoSize = 1;
-    int dataSize = strlen(data);
+    int origenSize = strlen(origen);
 
     // origen
     for (int i = 0; i < TRAMA_ORIGEN_SIZE; i++) {
@@ -78,14 +77,24 @@ char *crearTrama(char *origen, char tipo, char *data) {
     // data
     int dataIndex = 0;
 
-    for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < MAX_TRAMA_SIZE; i++) {
-        if (dataIndex < dataSize) {
+    if (tipo == 'D') { // es binario
+        for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < MAX_TRAMA_SIZE; i++) {
             trama[i] = data[dataIndex];
             dataIndex++;
-        } else {
-            trama[i] = '\0';
+        }
+    } else {
+        int dataSize = strlen(data);
+
+        for (int i = TRAMA_ORIGEN_SIZE + tipoSize; i < MAX_TRAMA_SIZE; i++) {
+            if (dataIndex < dataSize) {
+                trama[i] = data[dataIndex];
+                dataIndex++;
+            } else {
+                trama[i] = '\0';
+            }
         }
     }
+
 
     return trama;
 }
@@ -298,6 +307,8 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             char *trama = obtenerTrama('F', data);
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
+            sendImage(usuario->socketFD, "kenobi.jpg");
+
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
             if (tramaRespuesta[15] == 'I') {
@@ -306,7 +317,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 display("IMAGE KO\n");
             }
 
-            sendImage(usuario->socketFD, "kenobi.jpg");
 
 
             // char tramaRespuesta[MAX_TRAMA_SIZE];

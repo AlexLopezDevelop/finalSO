@@ -215,30 +215,17 @@ int sendImage(int socket, char *fileName) {
     char c[TRAMA_DATA_SIZE];
 
     while (!checkEOF(picture)) {
+        memset(c, 0, TRAMA_DATA_SIZE);
         read(picture, &c, sizeof(char) * TRAMA_DATA_SIZE);
 
-        ficheroFoto->tramas[ficheroFoto->totalTramas] = realloc(ficheroFoto->tramas[ficheroFoto->totalTramas],sizeof(char) * TRAMA_DATA_SIZE);
-        ficheroFoto->tramas[ficheroFoto->totalTramas] = strdup(c);
-
-        ficheroFoto->totalTramas++;
-        ficheroFoto->tramas = realloc(ficheroFoto->tramas, sizeof(char *) * (ficheroFoto->totalTramas + 1));
-        ficheroFoto->tramas[ficheroFoto->totalTramas] = malloc(sizeof(char));
-
+        char *trama = obtenerTrama('D', c);
+        write(socket, trama, MAX_TRAMA_SIZE);
+        usleep(200);
     }
 
     ficheroFoto->totalTramas++;
 
     close(picture);
-
-    // send to server
-    for (int j = 0; j < ficheroFoto->totalTramas; j++) {
-        char *trama = obtenerTrama('D', ficheroFoto->tramas[j]);
-        write(socket, trama, TRAMA_DATA_SIZE);
-        display("Trama enviada");
-        display("\n");
-        sleep(1);
-        liberarMemoria(trama);
-    }
 
     display("Foto Enviada");
     return 0;
