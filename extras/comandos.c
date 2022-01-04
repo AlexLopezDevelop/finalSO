@@ -230,19 +230,39 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         }
     } else if (strcmp("PHOTO", comando) == 0) {
         if (totalParams == 1) {
-            char *args[] = {"md5sum", instruccion[1], 0};
-            int fd = open("md5sum.txt", O_CREAT | O_WRONLY, S_IRWXU);
-            pid_t pid = fork();
+            char *data;
+            asprintf(&data, "%s", instruccion[1]);
+            char *trama = obtenerTrama('P', data);
+            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            if (!pid) {
-                dup2(fd, STDOUT_FILENO);
+            char tramaRespuesta[MAX_TRAMA_SIZE];
+            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+
+           /* for (int j = 0; j < 83; j++) {
+                char tramaRespuesta[MAX_TRAMA_SIZE];
+                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                int fd;
+
+                fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
+
+                if (errorAbrir(fd)) {
+                    display("Error al guardar la imagen\n");
+                }
+
+
+                if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas-1) == i) {
+                    write(fd, conexionData->datos, sizeof (char) * (fotoData->size % TRAMA_DATA_SIZE));
+                    i=0;
+                } else {
+                    write(fd, conexionData->datos, sizeof (char) *TRAMA_DATA_SIZE);
+                    i++;
+                }
+
+
                 close(fd);
-                execvp(args[0], args);
-            }
+            }*/
 
-            write(usuario->socketFD, comando, sizeof(instruccion[0]));
 
-            display("Missatge enviat!\n");
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
@@ -301,13 +321,13 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
 
             char *md5File = generateMd5sum(instruccion[1]);
 
-            char *data = concatStringsPorAsterico(instruccion[1], sizeFileString);
-            data = concatStringsPorAsterico(data, md5File);
+            char *data;
+            asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString,md5File);
 
             char *trama = obtenerTrama('F', data);
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            sendImage(usuario->socketFD, "kenobi.jpg");
+            sendImage(usuario->socketFD, instruccion[1]);
 
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -329,7 +349,8 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             if (usuario->socketFD > 0) {
                 char userId[20];
                 sprintf(userId, "%d", usuario->id);
-                char *data = concatStringsPorAsterico(usuario->nombre, userId);
+                char *data;
+                asprintf(&data, "%s*%s", usuario->nombre, userId);
                 char *trama = obtenerTrama('Q', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
                 display("Desconectado de Atreides! Dew!\n");
