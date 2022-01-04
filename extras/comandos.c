@@ -5,6 +5,8 @@
 #include "comandos.h"
 #include "funciones.h"
 #include "../modelos/configuracion.h"
+#include "../modelos/conexion.h"
+#include "ficheros.h"
 
 #include <string.h>
 #include <stdbool.h>
@@ -238,30 +240,45 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
-           /* for (int j = 0; j < 83; j++) {
-                char tramaRespuesta[MAX_TRAMA_SIZE];
-                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+            ConexionData *conexionData = guardarTrama(tramaRespuesta);
+            FotoData *fotoData = destructDataImagen(conexionData->datos);
+
+            bool descargandoImagen = true;
+            char tramaImagen[MAX_TRAMA_SIZE];
+
+            fotoData->totalTramas = fotoData->size / TRAMA_DATA_SIZE;
+            if (fotoData->size % TRAMA_DATA_SIZE != 0) {
+                fotoData->totalTramas++;
+            }
+
+            while (descargandoImagen) {
+                memset(tramaImagen, 0, TRAMA_DATA_SIZE);
+                memset(conexionData, 0, sizeof (ConexionData));
+                read(usuario->socketFD, tramaImagen, MAX_TRAMA_SIZE);
+
                 int fd;
 
                 fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
 
-                if (errorAbrir(fd)) {
+                if (errorAbrir(fd, fotoData->nombre)) {
                     display("Error al guardar la imagen\n");
                 }
 
+                conexionData = guardarTrama(tramaImagen);
 
-                if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas-1) == i) {
-                    write(fd, conexionData->datos, sizeof (char) * (fotoData->size % TRAMA_DATA_SIZE));
-                    i=0;
+                if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas - 1) == i) {
+                    write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
+                    i = 0;
+                    descargandoImagen = false;
                 } else {
-                    write(fd, conexionData->datos, sizeof (char) *TRAMA_DATA_SIZE);
+                    write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
                     i++;
                 }
 
-
                 close(fd);
-            }*/
+            }
 
+            display("Foto descargada :)\n");
 
         } else {
             display("Comanda KO. Massa paràmetres\n");
@@ -273,7 +290,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 sprintf(idString, "%d", usuario->id);
                 char *data;
                 asprintf(&data, "%s*%s*%s", usuario->nombre, idString, instruccion[1]);
-                //concatStringsPorAstericoSearch(usuario->nombre, usuario->id, instruccion[1]);
                 char *trama = obtenerTrama('S', data);
 
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
@@ -322,7 +338,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             char *md5File = generateMd5sum(instruccion[1]);
 
             char *data;
-            asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString,md5File);
+            asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
 
             char *trama = obtenerTrama('F', data);
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);

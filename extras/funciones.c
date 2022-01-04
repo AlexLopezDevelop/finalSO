@@ -199,7 +199,6 @@ char *generateMd5sum(char *string) {
 
 int sendImage(int socket, char *fileName) {
     int picture;
-    char *datosBinarios;
     picture = open(fileName, O_RDONLY);
 
     if (errorAbrir(picture, fileName)) {
@@ -213,9 +212,6 @@ int sendImage(int socket, char *fileName) {
     ficheroFoto->tramas[0] = malloc(sizeof(char));
 
     char c[TRAMA_DATA_SIZE];
-    int fd;
-
-    fd = open("copiaKenobi.jpg", O_WRONLY | O_CREAT | O_TRUNC, 00666);
 
     while (!checkEOF(picture)) {
         memset(c, 0, TRAMA_DATA_SIZE);
@@ -224,13 +220,9 @@ int sendImage(int socket, char *fileName) {
         char *trama = obtenerTrama('D', c);
         write(socket, trama, MAX_TRAMA_SIZE);
         usleep(200);
-
-        write(fd,&c,sizeof(char) *TRAMA_DATA_SIZE);
     }
 
-
     close(picture);
-
 
     display("Foto Enviada");
     return 0;

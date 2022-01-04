@@ -3,7 +3,6 @@
 //
 
 #include "ficheros.h"
-#include <stdio.h>
 #include "funciones.h"
 
 int leerFichero(char *pathFile, Configuracion *config) {
@@ -28,6 +27,50 @@ int leerFichero(char *pathFile, Configuracion *config) {
     return 0;
 }
 
+ConexionData *guardarTrama(const char *trama) {
+    ConexionData *conexionData;
+    conexionData = malloc(sizeof(ConexionData));
+
+    // obtener origen
+    for (int i = 0; i < TRAMA_ORIGEN_SIZE; ++i) {
+        conexionData->origen[i] = trama[i];
+        if (trama[i] == '\0') {
+            break;
+        }
+    }
+
+    // obtener tipo
+    conexionData->tipo = trama[TRAMA_ORIGEN_SIZE];
+
+    // obtener data
+    int dataIndex = 0;
+
+    for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
+        conexionData->datos[dataIndex] = trama[i];
+        dataIndex++;
+    }
+
+    return conexionData;
+}
+
+FotoData *destructDataImagen(char *datos) {
+    FotoData *fotoData = malloc(sizeof(FotoData));
+    char delim[] = "*";
+    char *ptr = strtok(datos, delim);
+
+    while (ptr != NULL) {
+        fotoData->nombre = strdup(ptr);
+        ptr = strtok(NULL, delim);
+        fotoData->size = atoi(ptr);
+        ptr = strtok(NULL, delim);
+        fotoData->md5sum = strdup(ptr);
+        ptr = strtok(NULL, delim);
+    }
+
+    fotoData->sizeTrama = fotoData->size / TRAMA_DATA_SIZE;
+
+    return fotoData;
+}
 
 /*
  *
