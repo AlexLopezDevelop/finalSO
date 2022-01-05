@@ -5,21 +5,21 @@
 #include "ficheros.h"
 #include "funciones.h"
 
-int leerFichero(char *pathFile, Configuracion *config) {
+int ficheros_leer_fichero(char *pathFile, Configuracion *config) {
 
     int fd;
 
     fd = open(pathFile, O_RDONLY);
 
-    if (errorAbrir(fd)) {
+    if (funciones_error_abrir(fd)) {
         return 1;
     }
 
-    while (!checkEOF(fd)) {
-        config->tiempoLimpieza = atoi(readLineFile(fd, '\n'));
-        config->ip = strdup(readLineFile(fd, '\n'));
-        config->puerto = atoi(readLineFile(fd, '\n'));
-        config->directorio = strdup(readLineFile(fd, '\n'));
+    while (!funciones_check_eof(fd)) {
+        config->tiempoLimpieza = atoi(funciones_read_line_file(fd, '\n'));
+        config->ip = strdup(funciones_read_line_file(fd, '\n'));
+        config->puerto = atoi(funciones_read_line_file(fd, '\n'));
+        config->directorio = strdup(funciones_read_line_file(fd, '\n'));
     }
 
     close(fd);
@@ -27,7 +27,7 @@ int leerFichero(char *pathFile, Configuracion *config) {
     return 0;
 }
 
-ConexionData *guardarTrama(const char *trama) {
+ConexionData *ficheros_guardar_trama(const char *trama) {
     ConexionData *conexionData;
     conexionData = malloc(sizeof(ConexionData));
 
@@ -53,7 +53,7 @@ ConexionData *guardarTrama(const char *trama) {
     return conexionData;
 }
 
-FotoData *destructDataImagen(char *datos) {
+FotoData *ficheros_destruct_data_imagen(char *datos) {
     FotoData *fotoData = malloc(sizeof(FotoData));
     char delim[] = "*";
     char *ptr = strtok(datos, delim);
@@ -71,30 +71,3 @@ FotoData *destructDataImagen(char *datos) {
 
     return fotoData;
 }
-
-/*
- *
- *char *readLineFile(int fd, char hasta) {
-    int i = 0, size;
-    char c = '\0';
-    char *string = (char *) malloc(sizeof(char));
-
-    while (1) {
-        size = read(fd, &c, sizeof(char));
-
-        if (c != hasta && size > 0) {
-            string = (char *) realloc(string, sizeof(char) * (i + 2));
-            string[i++] = c;
-        } else {
-            break;
-        }
-
-    }
-
-    string[i] = '\0';
-
-    return string;
-
-}
- *
- */
