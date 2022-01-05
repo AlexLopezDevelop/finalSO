@@ -366,6 +366,8 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 char *trama = obtenerTrama('Q', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
                 display("Desconectado de Atreides! Dew!\n");
+
+                exit(0);
             } else {
                 display("Has de realizar el login primero\n");
             }
