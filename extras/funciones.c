@@ -82,18 +82,15 @@ int funciones_error_argumentos(int argc, char *argv[], int num_argumentos) {
     }
 }
 
-int funciones_error_abrir(int fd, char *nombre_f) {
+int funciones_error_abrir(int fd) {
     char aux[200];
 
     if (fd < 0) {
         sprintf(aux, "\nERROR al abrir el fichero\n");
         funciones_display(aux);
         return 1;
-    } else {
-        sprintf(aux, "\nEl fichero: %s se ha abierto correctamente\n", nombre_f);
-        funciones_display(aux);
-        return 0;
     }
+    return 0;
 }
 
 void funciones_rea_input(char **string) {
@@ -186,7 +183,7 @@ char *funciones_generate_md5sum(char *string) {
 
     char *md5String = malloc(sizeof(char) * 33);
 
-    if (funciones_error_abrir(fd, MD5FILE)) {
+    if (funciones_error_abrir(fd)) {
         return md5String;
     }
 
@@ -201,7 +198,7 @@ int funciones_send_image(int socket, char *fileName) {
     int picture;
     picture = open(fileName, O_RDONLY);
 
-    if (funciones_error_abrir(picture, fileName)) {
+    if (funciones_error_abrir(picture)) {
         funciones_display("Error Opening Image File");
         return 1;
     }
@@ -224,6 +221,5 @@ int funciones_send_image(int socket, char *fileName) {
 
     close(picture);
 
-    funciones_display("Foto Enviada");
     return 0;
 }

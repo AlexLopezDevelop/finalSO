@@ -50,7 +50,7 @@ void funciones_liberar_memoria(void *ptr);
 
 char *funciones_read_line_file(int fd, char hasta);
 
-int funciones_error_abrir(int fd, char *nombre_f);
+int funciones_error_abrir(int fd);
 
 void funciones_rea_input(char **string);
 

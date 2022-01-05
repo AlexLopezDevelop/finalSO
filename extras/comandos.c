@@ -260,7 +260,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
 
                 fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
 
-                if (funciones_error_abrir(fd, fotoData->nombre)) {
+                if (funciones_error_abrir(fd)) {
                     funciones_display("Error al guardar la imagen\n");
                 }
 
@@ -329,26 +329,32 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         if (totalParams == 1) {
             char sizeFileString[100];
 
+            int fd = open(instruccion[1],O_RDONLY);
+            if (fd > 0) {
+                close(fd);
+                int sizeFile = funciones_get_file_size(instruccion[1]);
+                sprintf(sizeFileString, "%d", sizeFile);
 
-            int sizeFile = funciones_get_file_size(instruccion[1]);
-            sprintf(sizeFileString, "%d", sizeFile);
+                char *md5File = funciones_generate_md5sum(instruccion[1]);
 
-            char *md5File = funciones_generate_md5sum(instruccion[1]);
+                char *data;
+                asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
 
-            char *data;
-            asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
+                char *trama = comandos_obtener_trama('F', data);
+                write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            char *trama = comandos_obtener_trama('F', data);
-            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                funciones_send_image(usuario->socketFD, instruccion[1]);
 
-            funciones_send_image(usuario->socketFD, instruccion[1]);
-
-            char tramaRespuesta[MAX_TRAMA_SIZE];
-            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-            if (tramaRespuesta[15] == 'I') {
-                funciones_display("IMAGE OK\n");
-            } else if (tramaRespuesta[15] == 'R') {
-                funciones_display("IMAGE KO\n");
+                char tramaRespuesta[MAX_TRAMA_SIZE];
+                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                if (tramaRespuesta[15] == 'I') {
+                    funciones_display("IMAGE OK\n");
+                } else if (tramaRespuesta[15] == 'R') {
+                    funciones_display("IMAGE KO\n");
+                }
+            } else {
+                funciones_display("Error al enviar a Atreides. No existe la imagen\n");
+                close(fd);
             }
 
 

@@ -11,7 +11,7 @@ int ficheros_leer_fichero(char *pathFile, Configuracion *config) {
 
     fd = open(pathFile, O_RDONLY);
 
-    if (funciones_error_abrir(fd, pathFile)) {
+    if (funciones_error_abrir(fd)) {
         return 1;
     }
 
