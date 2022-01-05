@@ -17,22 +17,22 @@ void salir() {
 }
 
 int main(int argc, char *argv[]) {
-    funciones_errorArgumentos(argc, argv, 2);
+    funciones_error_argumentos(argc, argv, 2);
 
     funciones_display("Benvingut a Fremen\n");
 
     char * fileName;
     fileName = strdup(argv[1]);
 
-    if (ficheros_leerFichero(fileName, &config)) {
+    if (ficheros_leer_fichero(fileName, &config)) {
         return 1;
     }
 
     signal(SIGINT, salir);
 
-    comandos_pedirInstruccion();
+    comandos_pedir_instruccion();
 
-    funciones_liberarMemoria(fileName);
+    funciones_liberar_memoria(fileName);
 
     return 0;
 }

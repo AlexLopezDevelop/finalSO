@@ -101,7 +101,7 @@ char *crearTrama(char *origen, char tipo, char *data) {
     return trama;
 }
 
-char *comandos_obtenerTrama(char tipo, char *data) {
+char *comandos_obtener_trama(char tipo, char *data) {
     return crearTrama("FREMEN", tipo, data);
 }
 
@@ -119,7 +119,7 @@ ListadoUsuarios *destructTramaRespuesta(char *tramaRespuesta) {
     }
 
     //total
-    lineaFile = strdup((funciones_readStringTo(dataTrama, '*')));
+    lineaFile = strdup((funciones_read_string_to(dataTrama, '*')));
     listadoUsuarios->total = atoi(lineaFile);
     free(lineaFile);
     //reservamos memoria con el total
@@ -204,10 +204,10 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2) {
             socketFD = establecerConexion();
-            //char *data = funciones_concatStringsPorAsterico(instruccion[1], instruccion[2]);
+            //char *data = funciones_concat_strings_por_asterico(instruccion[1], instruccion[2]);
             char *data;
             asprintf(&data, "%s*%s", instruccion[1], instruccion[2]);
-            char *trama = comandos_obtenerTrama('C', data);
+            char *trama = comandos_obtener_trama('C', data);
             write(socketFD, trama, MAX_TRAMA_SIZE);
 
 
@@ -234,14 +234,14 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         if (totalParams == 1) {
             char *data;
             asprintf(&data, "%s", instruccion[1]);
-            char *trama = comandos_obtenerTrama('P', data);
+            char *trama = comandos_obtener_trama('P', data);
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
-            ConexionData *conexionData = ficheros_guardarTrama(tramaRespuesta);
-            FotoData *fotoData = ficheros_destructDataImagen(conexionData->datos);
+            ConexionData *conexionData = ficheros_guardar_trama(tramaRespuesta);
+            FotoData *fotoData = ficheros_destruct_data_imagen(conexionData->datos);
 
             bool descargandoImagen = true;
             char tramaImagen[MAX_TRAMA_SIZE];
@@ -260,11 +260,11 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
 
                 fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
 
-                if (funciones_errorAbrir(fd, fotoData->nombre)) {
+                if (funciones_error_abrir(fd, fotoData->nombre)) {
                     funciones_display("Error al guardar la imagen\n");
                 }
 
-                conexionData = ficheros_guardarTrama(tramaImagen);
+                conexionData = ficheros_guardar_trama(tramaImagen);
 
                 if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas - 1) == i) {
                     write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
@@ -290,7 +290,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 sprintf(idString, "%d", usuario->id);
                 char *data;
                 asprintf(&data, "%s*%s*%s", usuario->nombre, idString, instruccion[1]);
-                char *trama = comandos_obtenerTrama('S', data);
+                char *trama = comandos_obtener_trama('S', data);
 
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
@@ -330,18 +330,18 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
             char sizeFileString[100];
 
 
-            int sizeFile = funciones_getFileSize(instruccion[1]);
+            int sizeFile = funciones_get_file_size(instruccion[1]);
             sprintf(sizeFileString, "%d", sizeFile);
 
-            char *md5File = funciones_generateMd5sum(instruccion[1]);
+            char *md5File = funciones_generate_md5sum(instruccion[1]);
 
             char *data;
             asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
 
-            char *trama = comandos_obtenerTrama('F', data);
+            char *trama = comandos_obtener_trama('F', data);
             write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            funciones_sendImage(usuario->socketFD, instruccion[1]);
+            funciones_send_image(usuario->socketFD, instruccion[1]);
 
             char tramaRespuesta[MAX_TRAMA_SIZE];
             read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -363,7 +363,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
                 sprintf(userId, "%d", usuario->id);
                 char *data;
                 asprintf(&data, "%s*%s", usuario->nombre, userId);
-                char *trama = comandos_obtenerTrama('Q', data);
+                char *trama = comandos_obtener_trama('Q', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
                 funciones_display("Desconectado de Atreides! Dew!\n");
 
@@ -381,7 +381,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
     return 0;
 }
 
-_Noreturn void comandos_pedirInstruccion() {
+_Noreturn void comandos_pedir_instruccion() {
     int socketFD = -1;
     Usuario *usuario = malloc(sizeof(Usuario));
     while (1) {
@@ -415,14 +415,14 @@ _Noreturn void comandos_pedirInstruccion() {
                 totalParams++;
                 paramList = realloc(paramList, sizeof(char *) * (totalParams + 1));
                 i = 0;
-                funciones_liberarMemoria(aux);
+                funciones_liberar_memoria(aux);
                 aux = malloc(sizeof(char));
             } else {
                 aux = (char *) realloc(aux, (i + 1));
             }
         }
 
-        funciones_liberarMemoria(aux);
+        funciones_liberar_memoria(aux);
         // END Separar instruccion y parametros
 
         // Añadir el NULL al final del params
@@ -457,13 +457,13 @@ _Noreturn void comandos_pedirInstruccion() {
                     waitpid(son_pid, NULL, 0);
                     funciones_display("------------------------------------------------------------\n");
                     for (int j = 0; j < totalParams; j++) {
-                        funciones_liberarMemoria(paramList[j]);
+                        funciones_liberar_memoria(paramList[j]);
                     }
-                    funciones_liberarMemoria(paramList);
-                    funciones_liberarMemoria(aux);
-                    funciones_liberarMemoria(usuario->nombre);
-                    funciones_liberarMemoria(usuario->codigoPostal);
-                    funciones_liberarMemoria(usuario);
+                    funciones_liberar_memoria(paramList);
+                    funciones_liberar_memoria(aux);
+                    funciones_liberar_memoria(usuario->nombre);
+                    funciones_liberar_memoria(usuario->codigoPostal);
+                    funciones_liberar_memoria(usuario);
                     break;
             }
         }

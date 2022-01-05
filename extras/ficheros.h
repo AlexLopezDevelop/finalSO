@@ -8,10 +8,10 @@
 #include "../modelos/configuracion.h"
 #include "../modelos/conexion.h"
 
-int ficheros_leerFichero(char *pathFile, Configuracion *config);
+int ficheros_leer_fichero(char *pathFile, Configuracion *config);
 
-ConexionData *ficheros_guardarTrama(const char *trama);
+ConexionData *ficheros_guardar_trama(const char *trama);
 
-FotoData *ficheros_destructDataImagen(char *datos);
+FotoData *ficheros_destruct_data_imagen(char *datos);
 
 #endif //PRACTICAFINALSO_FICHEROS_H
