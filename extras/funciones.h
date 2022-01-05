@@ -40,30 +40,30 @@
 #define FILE1 "Config.dat"
 #define MD5FILE "md5sum.txt"
 
-int errorArgumentos(int argc, char *argv[], int num_argumentos);
+int funciones_errorArgumentos(int argc, char *argv[], int num_argumentos);
 
-void display(char *string);
+void funciones_display(char *string);
 
-int checkEOF(int fd);
+int funciones_checkEOF(int fd);
 
-void liberarMemoria(void *ptr);
+void funciones_liberarMemoria(void *ptr);
 
-char *readLineFile(int fd, char hasta);
+char *funciones_readLineFile(int fd, char hasta);
 
-int errorAbrir(int fd, char *nombre_f);
+int funciones_errorAbrir(int fd, char *nombre_f);
 
-void readInput(char **string);
+void funciones_readInput(char **string);
 
-char * readStringTo (char * string, char hasta);
+char * funciones_readStringTo (char * string, char hasta);
 
-char * concatStringsPorAsterico(char * string1, char * string2);
+char * funciones_concatStringsPorAsterico(char * string1, char * string2);
 
-char * concatStringsPorAstericoSearch(char * string1, int id, char * string3);
+char * funciones_concatStringsPorAstericoSearch(char * string1, int id, char * string3);
 
-int getFileSize(char * fileName);
+int funciones_getFileSize(char * fileName);
 
-char * generateMd5sum(char * string);
+char * funciones_generateMd5sum(char * string);
 
-int sendImage(int socket, char * fileName);
+int funciones_sendImage(int socket, char * fileName);
 
 #endif //PRACTICAFINALSO_FUNCIONES_H

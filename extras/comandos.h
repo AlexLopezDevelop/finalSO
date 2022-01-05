@@ -5,8 +5,8 @@
 #ifndef PRACTICAFINALSO_COMANDOS_H
 #define PRACTICAFINALSO_COMANDOS_H
 
-_Noreturn void pedirInstruccion();
+_Noreturn void comandos_pedirInstruccion();
 
-char *obtenerTrama(char tipo, char *data);
+char *comandos_obtenerTrama(char tipo, char *data);
 
 #endif //PRACTICAFINALSO_COMANDOS_H
