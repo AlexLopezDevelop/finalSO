@@ -260,7 +260,7 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
 
                 fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
 
-                if (errorAbrir(fd, fotoData->nombre)) {
+                if (errorAbrir(fd)) {
                     display("Error al guardar la imagen\n");
                 }
 
@@ -329,27 +329,33 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         if (totalParams == 1) {
             char sizeFileString[100];
 
+            int fd = open(instruccion[1],O_RDONLY);
+            if (fd > 0) {
+                close(fd);
+                int sizeFile = getFileSize(instruccion[1]);
+                sprintf(sizeFileString, "%d", sizeFile);
 
-            int sizeFile = getFileSize(instruccion[1]);
-            sprintf(sizeFileString, "%d", sizeFile);
+                char *md5File = generateMd5sum(instruccion[1]);
 
-            char *md5File = generateMd5sum(instruccion[1]);
+                char *data;
+                asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
 
-            char *data;
-            asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
+                char *trama = obtenerTrama('F', data);
+                write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-            char *trama = obtenerTrama('F', data);
-            write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                sendImage(usuario->socketFD, instruccion[1]);
 
-            sendImage(usuario->socketFD, instruccion[1]);
-
-            char tramaRespuesta[MAX_TRAMA_SIZE];
-            read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-            if (tramaRespuesta[15] == 'I') {
-                display("IMAGE OK\n");
-            } else if (tramaRespuesta[15] == 'R') {
-                display("IMAGE KO\n");
+                char tramaRespuesta[MAX_TRAMA_SIZE];
+                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                if (tramaRespuesta[15] == 'I') {
+                    display("Foto enviada amb èxit a Atreides.\n\n");
+                } else if (tramaRespuesta[15] == 'R') {
+                    display("Error foto no enviada a Atreides.\n\n");
+                }
+            } else {
+                display("Error. No existe la imagen\n\n");
             }
+
 
 
 

@@ -82,18 +82,15 @@ int errorArgumentos(int argc, char *argv[], int num_argumentos) {
     }
 }
 
-int errorAbrir(int fd, char *nombre_f) {
+int errorAbrir(int fd) {
     char aux[200];
 
     if (fd < 0) {
         sprintf(aux, "\nERROR al abrir el fichero\n");
         display(aux);
         return 1;
-    } else {
-        sprintf(aux, "\nEl fichero: %s se ha abierto correctamente\n", nombre_f);
-        display(aux);
-        return 0;
     }
+    return 0;
 }
 
 void readInput(char **string) {
@@ -186,7 +183,7 @@ char *generateMd5sum(char *string) {
 
     char *md5String = malloc(sizeof(char) * 33);
 
-    if (errorAbrir(fd, MD5FILE)) {
+    if (errorAbrir(fd)) {
         return md5String;
     }
 
@@ -201,7 +198,7 @@ int sendImage(int socket, char *fileName) {
     int picture;
     picture = open(fileName, O_RDONLY);
 
-    if (errorAbrir(picture, fileName)) {
+    if (errorAbrir(picture)) {
         display("Error Opening Image File");
         return 1;
     }
@@ -224,6 +221,5 @@ int sendImage(int socket, char *fileName) {
 
     close(picture);
 
-    display("Foto Enviada");
     return 0;
 }

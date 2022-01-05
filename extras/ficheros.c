@@ -11,7 +11,7 @@ int leerFichero(char *pathFile, Configuracion *config) {
 
     fd = open(pathFile, O_RDONLY);
 
-    if (errorAbrir(fd, pathFile)) {
+    if (errorAbrir(fd)) {
         return 1;
     }
 
