@@ -327,10 +327,8 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
         }
     } else if (strcmp("SEND", comando) == 0) {
         if (totalParams == 1) {
-            // TODO: obtener tamaño
             char sizeFileString[100];
-            // TODO: generar MD5SUM
-            //char * md5sum = NULL;
+
 
             int sizeFile = getFileSize(instruccion[1]);
             sprintf(sizeFileString, "%d", sizeFile);
@@ -355,8 +353,6 @@ int comandosPropios(char **instruccion, int totalParams, int socketFD, Usuario *
 
 
 
-            // char tramaRespuesta[MAX_TRAMA_SIZE];
-            // read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
         } else {
             display("Comanda KO. Massa paràmetres\n");
         }
