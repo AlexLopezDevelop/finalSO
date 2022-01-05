@@ -12,7 +12,7 @@ typedef struct {
 typedef struct {
     char * instruccion; // ls
     Param * params; // -l -a ..
-    int totalParams;
+    int totalParams = 0;
 } Instruccion;
 
 #endif //PRACTICAFINALSO_INSTRUCCION_H

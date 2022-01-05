@@ -5,21 +5,21 @@
 #include "ficheros.h"
 #include "funciones.h"
 
-int ficheros_leer_fichero(char *pathFile, Configuracion *config) {
+int leerFichero(char *pathFile, Configuracion *config) {
 
     int fd;
 
     fd = open(pathFile, O_RDONLY);
 
-    if (funciones_error_abrir(fd)) {
+    if (errorAbrir(fd, pathFile)) {
         return 1;
     }
 
-    while (!funciones_check_eof(fd)) {
-        config->tiempoLimpieza = atoi(funciones_read_line_file(fd, '\n'));
-        config->ip = strdup(funciones_read_line_file(fd, '\n'));
-        config->puerto = atoi(funciones_read_line_file(fd, '\n'));
-        config->directorio = strdup(funciones_read_line_file(fd, '\n'));
+    while (!checkEOF(fd)) {
+        config->tiempoLimpieza = atoi(readLineFile(fd, '\n'));
+        config->ip = strdup(readLineFile(fd, '\n'));
+        config->puerto = atoi(readLineFile(fd, '\n'));
+        config->directorio = strdup(readLineFile(fd, '\n'));
     }
 
     close(fd);
@@ -27,7 +27,7 @@ int ficheros_leer_fichero(char *pathFile, Configuracion *config) {
     return 0;
 }
 
-ConexionData *ficheros_guardar_trama(const char *trama) {
+ConexionData *guardarTrama(const char *trama) {
     ConexionData *conexionData;
     conexionData = malloc(sizeof(ConexionData));
 
@@ -53,7 +53,7 @@ ConexionData *ficheros_guardar_trama(const char *trama) {
     return conexionData;
 }
 
-FotoData *ficheros_destruct_data_imagen(char *datos) {
+FotoData *destructDataImagen(char *datos) {
     FotoData *fotoData = malloc(sizeof(FotoData));
     char delim[] = "*";
     char *ptr = strtok(datos, delim);
@@ -74,7 +74,7 @@ FotoData *ficheros_destruct_data_imagen(char *datos) {
 
 /*
  *
- *char *funciones_read_line_file(int fd, char hasta) {
+ *char *readLineFile(int fd, char hasta) {
     int i = 0, size;
     char c = '\0';
     char *string = (char *) malloc(sizeof(char));
