@@ -56,6 +56,8 @@ int comandos_extraer_id_trama(char *tramaRespuesta) {
             break;
         }
     }
+
+    funciones_liberar_memoria(aux);
     return idUSer;
 }
 
@@ -123,7 +125,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
     //total
     lineaFile = strdup((funciones_read_string_to(dataTrama, '*')));
     listadoUsuarios->total = atoi(lineaFile);
-    free(lineaFile);
+    funciones_liberar_memoria(lineaFile);
     //reservamos memoria con el total
     listadoUsuarios->usuarios = malloc(sizeof(Usuario) * listadoUsuarios->total);
 
@@ -157,7 +159,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
 
         listadoUsuarios->usuarios[i].nombre = strdup(auxString);
 
-        free(auxString);
+        funciones_liberar_memoria(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
@@ -178,12 +180,15 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
 
         listadoUsuarios->usuarios[i].id = atoi(auxString);
 
-        free(auxString);
+        funciones_liberar_memoria(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
         loopId = true;
     }
+
+    funciones_liberar_memoria(auxString);
+    funciones_liberar_memoria(dataTrama);
 
     return listadoUsuarios;
 }
@@ -208,12 +213,13 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
             if (isdigit(*instruccion[2])) {
                 socketFD = comandos_establecer_conexion();
-                //char *data = funciones_concat_strings_por_asterico(instruccion[1], instruccion[2]);
                 char *data;
                 asprintf(&data, "%s*%s", instruccion[1], instruccion[2]);
                 char *trama = comandos_obtener_trama('C', data);
                 write(socketFD, trama, MAX_TRAMA_SIZE);
 
+                funciones_liberar_memoria(data);
+                funciones_liberar_memoria(trama);
 
                 char tramaRespuesta[MAX_TRAMA_SIZE];
                 read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -238,12 +244,15 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
             funciones_display("Comanda KO. Falta paràmetres\n");
         }
     } else if (strcmp("PHOTO", comando) == 0) {
-        if (totalParams == 1 && strcmp(instruccion[1], "") != 0 ) {
+        if (totalParams == 1 && strcmp(instruccion[1], "") != 0) {
             if (isdigit(*instruccion[1])) {
                 char *data;
                 asprintf(&data, "%s", instruccion[1]);
                 char *trama = comandos_obtener_trama('P', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+
+                funciones_liberar_memoria(data);
+                funciones_liberar_memoria(trama);
 
                 char tramaRespuesta[MAX_TRAMA_SIZE];
                 read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -287,6 +296,16 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 }
 
                 funciones_display("Foto descargada :)\n");
+
+                funciones_liberar_memoria(conexionData);
+                funciones_liberar_memoria(fotoData->nombre);
+                funciones_liberar_memoria(fotoData->md5sum);
+                for (int j = 0; j < fotoData->totalTramas; ++j) {
+                    funciones_liberar_memoria(fotoData->tramas[j]);
+                }
+                funciones_liberar_memoria(fotoData->tramas);
+                funciones_liberar_memoria(fotoData);
+
             } else {
                 funciones_display("El primer parametro ha de ser un numero\n");
             }
@@ -294,16 +313,20 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
             funciones_display("Comanda KO. error paràmetres\n");
         }
     } else if ((strcmp("SEARCH", comando) == 0)) {
-        if (totalParams == 1 && strcmp(instruccion[1], "") != 0 ) {
+        if (totalParams == 1 && strcmp(instruccion[1], "") != 0) {
             if (isdigit(*instruccion[1])) {
                 if (usuario->socketFD > 0) {
                     char idString[20];
                     sprintf(idString, "%d", usuario->id);
+
                     char *data;
                     asprintf(&data, "%s*%s*%s", usuario->nombre, idString, instruccion[1]);
-                    char *trama = comandos_obtener_trama('S', data);
 
+                    char *trama = comandos_obtener_trama('S', data);
                     write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+
+                    funciones_liberar_memoria(data);
+                    funciones_liberar_memoria(trama);
 
                     char tramaRespuesta[MAX_TRAMA_SIZE];
                     read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -327,6 +350,14 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                         }
 
                         funciones_display("\n");
+
+                        for (int j = 0; j < listadoUsuarios->total; j++) {
+                            funciones_liberar_memoria(listadoUsuarios->usuarios[j].nombre);
+                            funciones_liberar_memoria(listadoUsuarios->usuarios[j].codigoPostal);
+                        }
+                        funciones_liberar_memoria(listadoUsuarios->usuarios);
+                        funciones_liberar_memoria(listadoUsuarios);
+
                     } else if (tramaRespuesta[15] == 'K') {
                         funciones_display("No hay ningun usuario con este codigo postal\n");
                     }
@@ -341,7 +372,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
             funciones_display("Comanda KO. error paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-        if (totalParams == 1 && strcmp(instruccion[1], "") != 0 ) {
+        if (totalParams == 1 && strcmp(instruccion[1], "") != 0) {
             char sizeFileString[100];
 
             int fd = open(instruccion[1], O_RDONLY);
@@ -357,6 +388,10 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                 char *trama = comandos_obtener_trama('F', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+
+                funciones_liberar_memoria(md5File);
+                funciones_liberar_memoria(data);
+                funciones_liberar_memoria(trama);
 
                 funciones_send_image(usuario->socketFD, instruccion[1]);
 
@@ -384,6 +419,10 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 asprintf(&data, "%s*%s", usuario->nombre, userId);
                 char *trama = comandos_obtener_trama('Q', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+
+                funciones_liberar_memoria(data);
+                funciones_liberar_memoria(trama);
+
                 funciones_display("Desconectado de Atreides! Dew!\n");
                 exit(0);
             } else {
@@ -396,6 +435,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
         return 1;
     }
 
+    funciones_liberar_memoria(comando);
     return 0;
 }
 
@@ -404,6 +444,7 @@ _Noreturn void comandos_pedir_instruccion() {
     Usuario *usuario = malloc(sizeof(Usuario));
     while (1) {
 
+        // TODO: quitar statico
         char entradaUsuario[40];
         funciones_display("$ ");
         read(0, entradaUsuario, 300);

@@ -67,6 +67,7 @@ int funciones_error_argumentos(int argc, char *argv[], int num_argumentos) {
 }
 
 int funciones_error_abrir(int fd) {
+    // TODO: quitar estatico
     char aux[200];
 
     if (fd < 0) {
@@ -187,11 +188,6 @@ int funciones_send_image(int socket, char *fileName) {
         return 1;
     }
 
-    FicheroFoto *ficheroFoto = malloc(sizeof(FicheroFoto));
-    ficheroFoto->totalTramas = 0;
-    ficheroFoto->tramas = malloc(sizeof(char *));
-    ficheroFoto->tramas[0] = malloc(sizeof(char));
-
     char c[TRAMA_DATA_SIZE];
 
     while (!funciones_check_eof(picture)) {
@@ -201,6 +197,8 @@ int funciones_send_image(int socket, char *fileName) {
         char *trama = comandos_obtener_trama('D', c);
         write(socket, trama, MAX_TRAMA_SIZE);
         usleep(200);
+
+        funciones_liberar_memoria(trama);
     }
 
     close(picture);
