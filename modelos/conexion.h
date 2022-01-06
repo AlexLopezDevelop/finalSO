@@ -20,7 +20,6 @@ typedef struct {
     int sizeTrama;
     int totalTramas;
     char * md5sum;
-    char **tramas;
 } FotoData;
 
 #endif //FINALSO_CONEXION_H

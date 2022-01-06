@@ -300,10 +300,6 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 funciones_liberar_memoria(conexionData);
                 funciones_liberar_memoria(fotoData->nombre);
                 funciones_liberar_memoria(fotoData->md5sum);
-                for (int j = 0; j < fotoData->totalTramas; ++j) {
-                    funciones_liberar_memoria(fotoData->tramas[j]);
-                }
-                funciones_liberar_memoria(fotoData->tramas);
                 funciones_liberar_memoria(fotoData);
 
             } else {
