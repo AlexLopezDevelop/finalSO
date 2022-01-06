@@ -288,7 +288,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                         i = 0;
                         descargandoImagen = false;
                     } else {
-                        if ((fotoData->totalTramas + 2) == i) {
+                        if ((fotoData->totalTramas + 4) == i) {
                             descargandoImagen = false;
                         }
                         write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
