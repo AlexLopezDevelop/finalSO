@@ -251,8 +251,8 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 char *trama = comandos_obtener_trama('P', data);
                 write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-                funciones_liberar_memoria(data);
-                funciones_liberar_memoria(trama);
+                //funciones_liberar_memoria(data);
+                //funciones_liberar_memoria(trama);
 
                 char tramaRespuesta[MAX_TRAMA_SIZE];
                 read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -288,6 +288,9 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                         i = 0;
                         descargandoImagen = false;
                     } else {
+                        if ((fotoData->totalTramas + 2) == i) {
+                            descargandoImagen = false;
+                        }
                         write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
                         i++;
                     }
@@ -297,10 +300,10 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                 funciones_display("Foto descargada :)\n");
 
-                funciones_liberar_memoria(conexionData);
-                funciones_liberar_memoria(fotoData->nombre);
-                funciones_liberar_memoria(fotoData->md5sum);
-                funciones_liberar_memoria(fotoData);
+               // funciones_liberar_memoria(conexionData);
+                //funciones_liberar_memoria(fotoData->nombre);
+                //funciones_liberar_memoria(fotoData->md5sum);
+                //funciones_liberar_memoria(fotoData);
 
             } else {
                 funciones_display("El primer parametro ha de ser un numero\n");
