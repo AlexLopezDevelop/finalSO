@@ -18,37 +18,22 @@ void funciones_display(char *string) {
     write(1, string, sizeof(char) * strlen(string));
 }
 
-char *funciones_read_string_to(char *string, char hasta) {
+char *funciones_read_string_to(char *string, char hasta[]) {
+    char *dataTrama, *aux;
+    int dataIndex = 0;
 
-    int i = 0;
-    char *aux = malloc(sizeof(char));
-    char caracter = '\0';
-
-    int lenString = strlen(string);
-    for (int j = 0; j < lenString || caracter != hasta; j++) {
-        caracter = string[j];
-        if (caracter != hasta) {
-            aux = (char *) realloc(aux, i + 1);
-            aux[i] = caracter;
-            i++;
-        }
-
+    dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
+    for (int i = 0; i < TRAMA_DATA_SIZE; i++) {
+        dataTrama[dataIndex] = string[i];
+        dataIndex++;
     }
-    aux[i - 1] = '\0';
+
+    char *ptr = strtok(dataTrama, hasta);
+    aux = strdup(ptr);
+
     return aux;
 }
 
-char *funciones_concat_strings_por_asterico(char *string1, char *string2) {
-    char *concatString = NULL;
-    int stringSize = strlen(string1) + strlen(string2) + 1;
-    concatString = malloc(stringSize * sizeof(char));
-
-    strcpy(concatString, string1);
-    strcat(concatString, "*");
-    strcat(concatString, string2);
-
-    return concatString;
-}
 
 int funciones_error_argumentos(int argc, char *argv[], int num_argumentos) {
 
@@ -76,29 +61,6 @@ int funciones_error_abrir(int fd) {
         return 1;
     }
     return 0;
-}
-
-void funciones_read_input(char **string) {
-    int i = 0;
-    char caracter = ' ';
-
-    // Bucle para leer caracteres entrados por teclado hasta Enter
-    while (caracter != '\n') {
-        // Lectura de caracter por caracter
-        read(0, &caracter, sizeof(char));
-
-        // Redimensiona la cadena por cada caracter del usuario
-        *string = (char *) realloc(*string, (sizeof(char) * (i + 1)));
-
-        // Asigna el caracter a la cadena
-        (*string)[i] = caracter;
-
-        // Cuando el caracter sea un salto de linea (enter) marcamos el fianl de la cadena
-        if (caracter == '\n') {
-            (*string)[i] = '\0';
-        }
-        i++;
-    }
 }
 
 char *funciones_read_line_file(int fd, char hasta) {
