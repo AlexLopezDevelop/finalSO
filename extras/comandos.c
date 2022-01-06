@@ -204,7 +204,8 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
     }
 
     if (strcmp("LOGIN", comando) == 0) {
-        if (totalParams == 2) {
+        if (totalParams == 2 && strcmp(instruccion[1], "") != 0 && strcmp(instruccion[2], "") != 0) {
+
             if (isdigit(*instruccion[2])) {
                 socketFD = comandos_establecer_conexion();
                 //char *data = funciones_concat_strings_por_asterico(instruccion[1], instruccion[2]);
@@ -237,7 +238,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
             funciones_display("Comanda KO. Falta paràmetres\n");
         }
     } else if (strcmp("PHOTO", comando) == 0) {
-        if (totalParams == 1) {
+        if (totalParams == 1 && strcmp(instruccion[1], "") != 0 ) {
             if (isdigit(*instruccion[1])) {
                 char *data;
                 asprintf(&data, "%s", instruccion[1]);
@@ -287,13 +288,13 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                 funciones_display("Foto descargada :)\n");
             } else {
-                funciones_display("El segundo parametro ha de ser un numero\n");
+                funciones_display("El primer parametro ha de ser un numero\n");
             }
         } else {
-            funciones_display("Comanda KO. Massa paràmetres\n");
+            funciones_display("Comanda KO. error paràmetres\n");
         }
     } else if ((strcmp("SEARCH", comando) == 0)) {
-        if (totalParams == 1) {
+        if (totalParams == 1 && strcmp(instruccion[1], "") != 0 ) {
             if (isdigit(*instruccion[1])) {
                 if (usuario->socketFD > 0) {
                     char idString[20];
@@ -334,13 +335,13 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 }
 
             } else {
-                funciones_display("El segundo parametro ha de ser un numero\n");
+                funciones_display("El primer parametro ha de ser un numero\n");
             }
         } else {
-            funciones_display("Comanda KO. Massa paràmetres\n");
+            funciones_display("Comanda KO. error paràmetres\n");
         }
     } else if (strcmp("SEND", comando) == 0) {
-        if (totalParams == 1) {
+        if (totalParams == 1 && strcmp(instruccion[1], "") != 0 ) {
             char sizeFileString[100];
 
             int fd = open(instruccion[1], O_RDONLY);
@@ -372,7 +373,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
 
         } else {
-            funciones_display("Comanda KO. Massa paràmetres\n");
+            funciones_display("Comanda KO. error paràmetres\n");
         }
     } else if (strcmp("LOGOUT", comando) == 0) {
         if (strcmp("LOGOUT", comando) == 0) {
