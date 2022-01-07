@@ -13,6 +13,8 @@
 #include <ctype.h>
 
 
+void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fotoData);
+
 int comandos_establecer_conexion() {
 
     int socketFD;
@@ -283,13 +285,15 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                     conexionData = ficheros_guardar_trama(tramaImagen);
 
-                    if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas - 1) == i) {
+                    if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas + 4) == i) {
                         write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
                         i = 0;
                         descargandoImagen = false;
+                        comandos_comparar_md5sum(usuario, trama, fotoData);
                     } else {
                         if ((fotoData->totalTramas + 4) == i) {
                             descargandoImagen = false;
+                            comandos_comparar_md5sum(usuario, trama, fotoData);
                         }
                         write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
                         i++;
@@ -392,7 +396,12 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 funciones_liberar_memoria(data);
                 funciones_liberar_memoria(trama);
 
-                funciones_send_image(usuario->socketFD, instruccion[1]);
+                int totalTramas = sizeFile / TRAMA_DATA_SIZE;
+                if (sizeFile % TRAMA_DATA_SIZE != 0) {
+                    totalTramas++;
+                }
+
+                funciones_send_image(usuario->socketFD, instruccion[1], totalTramas);
 
                 char tramaRespuesta[MAX_TRAMA_SIZE];
                 read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
@@ -436,6 +445,14 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
     funciones_liberar_memoria(comando);
     return 0;
+}
+
+void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fotoData) {
+    char *md5File = funciones_generate_md5sum(fotoData->nombre);
+    if (strcmp(fotoData->md5sum, md5File) == 0) {
+        trama = comandos_obtener_trama('I', "IMAGE OK");
+        write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+    }
 }
 
 _Noreturn void comandos_pedir_instruccion() {

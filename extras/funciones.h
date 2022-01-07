@@ -64,6 +64,6 @@ int funciones_get_file_size(char * fileName);
 
 char * funciones_generate_md5sum(char * string);
 
-int funciones_send_image(int socket, char * fileName);
+int funciones_send_image(int socket, char * fileName, int totalTramas);
 
 #endif //PRACTICAFINALSO_FUNCIONES_H

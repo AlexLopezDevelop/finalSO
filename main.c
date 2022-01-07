@@ -17,7 +17,9 @@ void salir() {
 }
 
 int main(int argc, char *argv[]) {
-    funciones_error_argumentos(argc, argv, 2);
+    if(funciones_error_argumentos(argc, argv, 2)) {
+        exit(1);
+    }
 
     funciones_display("Benvingut a Fremen\n");
 
@@ -25,7 +27,7 @@ int main(int argc, char *argv[]) {
     fileName = strdup(argv[1]);
 
     if (ficheros_leer_fichero(fileName, &config)) {
-        return 1;
+        exit(1);
     }
 
     signal(SIGINT, salir);

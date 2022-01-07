@@ -179,7 +179,7 @@ char *funciones_generate_md5sum(char *string) {
     return md5String;
 }
 
-int funciones_send_image(int socket, char *fileName) {
+int funciones_send_image(int socket, char *fileName, int totalTramas) {
     int picture;
     picture = open(fileName, O_RDONLY);
 
@@ -189,8 +189,9 @@ int funciones_send_image(int socket, char *fileName) {
     }
 
     char c[TRAMA_DATA_SIZE];
+    int currentTrama = 0;
 
-    while (!funciones_check_eof(picture)) {
+    while (totalTramas != currentTrama) {
         memset(c, 0, TRAMA_DATA_SIZE);
         read(picture, &c, sizeof(char) * TRAMA_DATA_SIZE);
 
@@ -199,6 +200,7 @@ int funciones_send_image(int socket, char *fileName) {
         usleep(200);
 
         funciones_liberar_memoria(trama);
+        currentTrama++;
     }
 
     close(picture);
