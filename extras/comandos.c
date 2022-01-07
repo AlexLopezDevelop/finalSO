@@ -119,13 +119,13 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
     char *lineaFile;
 
     dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
-    for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
+    for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; i++) {
         dataTrama[dataIndex] = tramaRespuesta[i];
         dataIndex++;
     }
-
     //total
-    lineaFile = strdup((funciones_read_string_to(dataTrama, '*')));
+    lineaFile = strdup((funciones_read_string_to(dataTrama, "*")));
+    int tramaIndex = strlen(lineaFile)+1;
     listadoUsuarios->total = atoi(lineaFile);
     funciones_liberar_memoria(lineaFile);
     //reservamos memoria con el total
@@ -134,7 +134,6 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
     // init
     char *auxString = malloc(sizeof(char));
     strcpy(auxString, "");
-    int tramaIndex = listadoUsuarios->total;
     int auxIndex = 0;
 
     int sizeTrama = strlen(dataTrama) + 1;
@@ -354,10 +353,6 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                         funciones_display("\n");
 
-                        for (int j = 0; j < listadoUsuarios->total; j++) {
-                            funciones_liberar_memoria(listadoUsuarios->usuarios[j].nombre);
-                            funciones_liberar_memoria(listadoUsuarios->usuarios[j].codigoPostal);
-                        }
                         funciones_liberar_memoria(listadoUsuarios->usuarios);
                         funciones_liberar_memoria(listadoUsuarios);
 

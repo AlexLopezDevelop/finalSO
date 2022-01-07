@@ -54,7 +54,7 @@ int funciones_error_abrir(int fd);
 
 void funciones_read_input(char **string);
 
-char * funciones_read_string_to (char * string, char hasta);
+char * funciones_read_string_to (char * string, char hasta[]);
 
 char * funciones_concat_strings_por_asterico(char * string1, char * string2);
 
