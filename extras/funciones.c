@@ -52,12 +52,8 @@ int funciones_error_argumentos(int argc, char *argv[], int num_argumentos) {
 }
 
 int funciones_error_abrir(int fd) {
-    // TODO: quitar estatico
-    char aux[200];
-
     if (fd < 0) {
-        sprintf(aux, "\nERROR al abrir el fichero\n");
-        funciones_display(aux);
+        funciones_display("\nERROR al abrir el fichero\n");
         return 1;
     }
     return 0;
