@@ -112,11 +112,12 @@ char *comandos_obtener_trama(char tipo, char *data) {
 }
 
 
-ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
+ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int socketFD) {
     ListadoUsuarios *listadoUsuarios = malloc(sizeof(ListadoUsuarios));
     char *dataTrama;
     int dataIndex = 0;
     char *lineaFile;
+    int totalUsuarios = 0;
 
     dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
     for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; i++) {
@@ -141,7 +142,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
     bool loopId = true;
 
     // usuarios
-    for (int i = 0; i < listadoUsuarios->total; ++i) {
+    for (int i = 0; i < listadoUsuarios->total; i++) {
 
         // nombre
         while (loopName) {
@@ -180,12 +181,32 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta) {
         }
 
         listadoUsuarios->usuarios[i].id = atoi(auxString);
+        totalUsuarios++;
 
         funciones_liberar_memoria(auxString);
         auxString = malloc(sizeof(char));
         auxIndex = 0;
         tramaIndex++;
         loopId = true;
+
+        if (listadoUsuarios->total != totalUsuarios) {
+            if (dataTrama[tramaIndex-1] == '\0') { // quedan mas tramas por llegar
+                memset(tramaRespuesta, 0, MAX_TRAMA_SIZE);
+                read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+
+                if (tramaRespuesta[15] == 'L') {
+
+                    dataIndex = 0;
+                    dataTrama = malloc(sizeof(char) * TRAMA_DATA_SIZE);
+                    for (int j = TRAMA_ORIGEN_SIZE + 1; j < MAX_TRAMA_SIZE; j++) {
+                        dataTrama[dataIndex] = tramaRespuesta[j];
+                        dataIndex++;
+                    }
+
+                    tramaIndex = 0;
+                }
+            }
+        }
     }
 
     funciones_liberar_memoria(auxString);
@@ -336,7 +357,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                     if (tramaRespuesta[15] == 'L') {
                         char auxid[30];
 
-                        ListadoUsuarios *listadoUsuarios = comandos_destruct_trama_respuesta(tramaRespuesta);
+                        ListadoUsuarios *listadoUsuarios = comandos_destruct_trama_respuesta(tramaRespuesta, usuario->socketFD);
 
                         funciones_display("\n");
                         sprintf(print, "Hi han %d persones humanes a %s\n", listadoUsuarios->total, instruccion[1]);
