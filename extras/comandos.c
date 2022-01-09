@@ -4,7 +4,6 @@
 
 #include "comandos.h"
 #include "funciones.h"
-#include "../modelos/configuracion.h"
 #include "../modelos/conexion.h"
 #include "ficheros.h"
 
@@ -15,7 +14,7 @@
 
 void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fotoData);
 
-int comandos_establecer_conexion() {
+int comandos_establecer_conexion(Configuracion config) {
 
     int socketFD;
     struct sockaddr_in servidor;
@@ -28,7 +27,7 @@ int comandos_establecer_conexion() {
 
     bzero(&servidor, sizeof(servidor));
     servidor.sin_family = AF_INET;
-    servidor.sin_port = htons(8755);
+    servidor.sin_port = htons(config.puerto);
 
     if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
         funciones_display("Error configurant IP\n");
@@ -215,7 +214,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int soc
     return listadoUsuarios;
 }
 
-int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario *usuario) {
+int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario *usuario, Configuracion config) {
     int i = 0;
     char print[200];
 
@@ -234,7 +233,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
         if (totalParams == 2 && strcmp(instruccion[1], "") != 0 && strcmp(instruccion[2], "") != 0) {
 
             if (isdigit(*instruccion[2])) {
-                socketFD = comandos_establecer_conexion();
+                socketFD = comandos_establecer_conexion(config);
                 char *data;
                 asprintf(&data, "%s*%s", instruccion[1], instruccion[2]);
                 char *trama = comandos_obtener_trama('C', data);
@@ -473,13 +472,11 @@ void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fot
     }
 }
 
-_Noreturn void comandos_pedir_instruccion() {
+_Noreturn void comandos_pedir_instruccion(Configuracion config) {
     int socketFD = -1;
     Usuario *usuario = malloc(sizeof(Usuario));
     while (1) {
-
-        // TODO: quitar statico
-        char entradaUsuario[40];
+        char entradaUsuario[250];
         funciones_display("$ ");
         read(0, entradaUsuario, 300);
 
@@ -521,7 +518,7 @@ _Noreturn void comandos_pedir_instruccion() {
         // Añadir el NULL al final del params
         paramList[totalParams] = NULL;
 
-        if (comandos_propios(paramList, totalParams - 1, socketFD, usuario)) {
+        if (comandos_propios(paramList, totalParams - 1, socketFD, usuario, config)) {
 
             funciones_display("Comanmdo: ");
             funciones_display(paramList[0]);

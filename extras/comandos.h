@@ -5,7 +5,9 @@
 #ifndef PRACTICAFINALSO_COMANDOS_H
 #define PRACTICAFINALSO_COMANDOS_H
 
-_Noreturn void comandos_pedir_instruccion();
+#include "../modelos/configuracion.h"
+
+_Noreturn void comandos_pedir_instruccion(Configuracion config);
 
 char *comandos_obtener_trama(char tipo, char *data);
 

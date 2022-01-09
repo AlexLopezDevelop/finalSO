@@ -3,8 +3,6 @@
 #include "modelos/configuracion.h"
 #include "extras/comandos.h"
 
-Configuracion config;
-
 void salir() {
     //free(config.directorio);
     //free(config.ip);
@@ -17,6 +15,7 @@ void salir() {
 }
 
 int main(int argc, char *argv[]) {
+    Configuracion config;
     if(funciones_error_argumentos(argc, argv, 2)) {
         exit(1);
     }
@@ -32,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     signal(SIGINT, salir);
 
-    comandos_pedir_instruccion();
+    comandos_pedir_instruccion(config);
 
     funciones_liberar_memoria(fileName);
 
