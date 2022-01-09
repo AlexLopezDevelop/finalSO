@@ -7,6 +7,7 @@
 #include "comandos.h"
 #include "../modelos/ficheros.h"
 
+// se le pasa un puntero y libera la memoria
 void funciones_liberar_memoria(void *ptr) {
     // Libermaos Memoria
     free(ptr);
@@ -14,10 +15,12 @@ void funciones_liberar_memoria(void *ptr) {
     ptr = NULL;
 }
 
+// se le pasa un string y se muestra por pantalla
 void funciones_display(char *string) {
     write(1, string, sizeof(char) * strlen(string));
 }
 
+// devuelve un string hasta un caracter del parametro string
 char *funciones_read_string_to(char *string, char hasta[]) {
     char *dataTrama, *aux;
     int dataIndex = 0;
@@ -34,7 +37,7 @@ char *funciones_read_string_to(char *string, char hasta[]) {
     return aux;
 }
 
-
+// comprueba que los argumentos sean correctos
 int funciones_error_argumentos(int argc, char *argv[], int num_argumentos) {
 
     if (argc != num_argumentos) {
@@ -51,6 +54,7 @@ int funciones_error_argumentos(int argc, char *argv[], int num_argumentos) {
     }
 }
 
+// Verifica si se ha abierto correctamente el fichero
 int funciones_error_abrir(int fd) {
     if (fd < 0) {
         funciones_display("\nERROR al abrir el fichero\n");
@@ -59,6 +63,7 @@ int funciones_error_abrir(int fd) {
     return 0;
 }
 
+// devuelve un string hasta el caracter de la linea de un fichero
 char *funciones_read_line_file(int fd, char hasta) {
     int i = 0, size;
     char c = '\0';
@@ -82,6 +87,7 @@ char *funciones_read_line_file(int fd, char hasta) {
 
 }
 
+// Verifica si es el final de un fichero
 int funciones_check_eof(int fd) {
     int num_bytes;
     char car;
@@ -100,6 +106,7 @@ int funciones_check_eof(int fd) {
     return 0;
 }
 
+// devuelve el size de un fichero
 int funciones_get_file_size(char *fileName) {
     struct stat sb;
 
@@ -111,6 +118,7 @@ int funciones_get_file_size(char *fileName) {
     return sb.st_size;
 }
 
+// obtiene el md5sum del fichero pasado por argumento
 char *funciones_generate_md5sum(char *string) {
     char *args[] = {"md5sum", string, 0};
     int fd = open(MD5FILE, O_CREAT | O_WRONLY, S_IRWXU);
@@ -137,6 +145,7 @@ char *funciones_generate_md5sum(char *string) {
     return md5String;
 }
 
+// envia una foto por tramas al servidor
 int funciones_send_image(int socket, char *fileName, int totalTramas) {
     int picture;
     picture = open(fileName, O_RDONLY);

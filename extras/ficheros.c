@@ -5,6 +5,7 @@
 #include "ficheros.h"
 #include "funciones.h"
 
+// Obtiene la informacion de configuracion incial a partir de un fichero
 int ficheros_leer_fichero(char *pathFile, Configuracion *config) {
 
     int fd;
@@ -27,6 +28,7 @@ int ficheros_leer_fichero(char *pathFile, Configuracion *config) {
     return 0;
 }
 
+// se le pasa una trama y la devuelve la informacion en un struct
 ConexionData *ficheros_guardar_trama(const char *trama) {
     ConexionData *conexionData;
     conexionData = malloc(sizeof(ConexionData));
@@ -53,6 +55,7 @@ ConexionData *ficheros_guardar_trama(const char *trama) {
     return conexionData;
 }
 
+// devuelve un struct con los datos de la trama de imagen
 FotoData *ficheros_destruct_data_imagen(char *datos) {
     FotoData *fotoData = malloc(sizeof(FotoData));
     char delim[] = "*";
