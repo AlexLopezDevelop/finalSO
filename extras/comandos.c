@@ -446,6 +446,8 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                 funciones_liberar_memoria(data);
                 funciones_liberar_memoria(trama);
+                funciones_liberar_memoria(usuario->nombre);
+                funciones_liberar_memoria(usuario->codigoPostal);
 
                 funciones_display("Desconectado de Atreides! Dew!\n");
                 exit(0);
@@ -551,10 +553,6 @@ _Noreturn void comandos_pedir_instruccion() {
                         funciones_liberar_memoria(paramList[j]);
                     }
                     funciones_liberar_memoria(paramList);
-                    funciones_liberar_memoria(aux);
-                    funciones_liberar_memoria(usuario->nombre);
-                    funciones_liberar_memoria(usuario->codigoPostal);
-                    funciones_liberar_memoria(usuario);
                     break;
             }
         }
