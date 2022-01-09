@@ -14,15 +14,14 @@
 
 void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fotoData);
 
+// comprueba y establece la conexion con el servidor
 int comandos_establecer_conexion(Configuracion config) {
 
     int socketFD;
     struct sockaddr_in servidor;
 
-
     if ((socketFD = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
         funciones_display("Error creant el socket\n");
-    } else {
     }
 
     bzero(&servidor, sizeof(servidor));
@@ -31,24 +30,24 @@ int comandos_establecer_conexion(Configuracion config) {
 
     if (inet_pton(AF_INET, "127.0.0.1", &servidor.sin_addr) < 0) {
         funciones_display("Error configurant IP\n");
-    } else {
     }
 
     if (connect(socketFD, (struct sockaddr *) &servidor, sizeof(servidor)) < 0) {
         funciones_display("Error fent el connect\n");
-    } else {
     }
 
     return socketFD;
 
 }
 
+// devuelve el id del usuario de la trama pasada por parametro
 int comandos_extraer_id_trama(char *tramaRespuesta) {
     int idUSer = 0;
     int dataIndex = 0;
     char *aux;
     aux = malloc(sizeof(char) * TRAMA_DATA_SIZE);
 
+    // buscamos la informacion en el intervalo de la trama donde esta la informacion
     for (int i = TRAMA_ORIGEN_SIZE + 1; i < MAX_TRAMA_SIZE; ++i) {
         aux[dataIndex] = tramaRespuesta[i];
         dataIndex++;
@@ -62,6 +61,7 @@ int comandos_extraer_id_trama(char *tramaRespuesta) {
     return idUSer;
 }
 
+// crea una trama para enviar al servidor con toda la informacion necesaria
 char *comandos_crear_trama(char *origen, char tipo, char *data) {
     char *trama = NULL;
     trama = malloc(sizeof(char) * MAX_TRAMA_SIZE);
@@ -106,11 +106,12 @@ char *comandos_crear_trama(char *origen, char tipo, char *data) {
     return trama;
 }
 
+// devuelve el struct con la informacion base para el envio
 char *comandos_obtener_trama(char tipo, char *data) {
     return comandos_crear_trama("FREMEN", tipo, data);
 }
 
-
+// recibe una trama con todos datos del listado de usuarios y devuelve toda la informacion en un struct
 ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int socketFD) {
     ListadoUsuarios *listadoUsuarios = malloc(sizeof(ListadoUsuarios));
     char *dataTrama;
@@ -123,11 +124,13 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int soc
         dataTrama[dataIndex] = tramaRespuesta[i];
         dataIndex++;
     }
+
     //total
     lineaFile = strdup((funciones_read_string_to(dataTrama, "*")));
     int tramaIndex = strlen(lineaFile)+1;
     listadoUsuarios->total = atoi(lineaFile);
     funciones_liberar_memoria(lineaFile);
+
     //reservamos memoria con el total
     listadoUsuarios->usuarios = malloc(sizeof(Usuario) * listadoUsuarios->total);
 
@@ -214,6 +217,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int soc
     return listadoUsuarios;
 }
 
+// Verifica que el comando sea propio, en dicho caso ejecuta su funcionalidad
 int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario *usuario, Configuracion config) {
     int i = 0;
     char print[200];
@@ -289,6 +293,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                     fotoData->totalTramas++;
                 }
 
+                // espera a que lleguen todas las tramas de la imagen
                 while (descargandoImagen) {
                     memset(tramaImagen, 0, TRAMA_DATA_SIZE);
                     memset(conexionData, 0, sizeof(ConexionData));
@@ -464,6 +469,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
     return 0;
 }
 
+// Envia una trama al servidor en caso de que el md5sum del fichero descargado y el del servidor sean identicos
 void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fotoData) {
     char *md5File = funciones_generate_md5sum(fotoData->nombre);
     if (strcmp(fotoData->md5sum, md5File) == 0) {
@@ -472,6 +478,7 @@ void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fot
     }
 }
 
+// Se encarga de esperar una respuesta del usuario y mira si es un comando valido
 _Noreturn void comandos_pedir_instruccion(Configuracion config) {
     int socketFD = -1;
     Usuario *usuario = malloc(sizeof(Usuario));
@@ -556,6 +563,7 @@ _Noreturn void comandos_pedir_instruccion(Configuracion config) {
     }
 }
 
+// lee un file descriptor hasta el caracter del parametro end
 char* read_until(int fd, char end) {
     int i = 0, size;
     char c = '\0';
