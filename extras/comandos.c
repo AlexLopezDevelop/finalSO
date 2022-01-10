@@ -283,50 +283,59 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
                 ConexionData *conexionData = ficheros_guardar_trama(tramaRespuesta);
-                FotoData *fotoData = ficheros_destruct_data_imagen(conexionData->datos);
 
-                bool descargandoImagen = true;
-                char tramaImagen[MAX_TRAMA_SIZE];
+                if (tramaRespuesta[15] == 'F' && strcmp(conexionData->datos, "FILE NOT FOUND") == 0) {
+                    funciones_display("File not found\n");
+                } else {
+                    FotoData *fotoData = ficheros_destruct_data_imagen(conexionData->datos);
 
-                fotoData->totalTramas = fotoData->size / TRAMA_DATA_SIZE;
-                if (fotoData->size % TRAMA_DATA_SIZE != 0) {
-                    fotoData->totalTramas++;
-                }
+                    bool descargandoImagen = true;
+                    char tramaImagen[MAX_TRAMA_SIZE];
 
-                // espera a que lleguen todas las tramas de la imagen
-                while (descargandoImagen) {
-                    memset(tramaImagen, 0, TRAMA_DATA_SIZE);
-                    memset(conexionData, 0, sizeof(ConexionData));
-                    read(usuario->socketFD, tramaImagen, MAX_TRAMA_SIZE);
-
-                    int fd;
-
-                    fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
-
-                    if (funciones_error_abrir(fd)) {
-                        funciones_display("Error al guardar la imagen\n");
+                    fotoData->totalTramas = fotoData->size / TRAMA_DATA_SIZE;
+                    if (fotoData->size % TRAMA_DATA_SIZE != 0) {
+                        fotoData->totalTramas++;
                     }
 
-                    conexionData = ficheros_guardar_trama(tramaImagen);
+                    // en caso de existir ya la imagen borra la antigua
+                    remove(fotoData->nombre);
 
-                    if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas + 4) == i) {
-                        write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
-                        i = 0;
-                        descargandoImagen = false;
-                        comandos_comparar_md5sum(usuario, trama, fotoData);
-                    } else {
-                        if ((fotoData->totalTramas + 4) == i) {
+                    // espera a que lleguen todas las tramas de la imagen
+                    while (descargandoImagen) {
+                        memset(tramaImagen, 0, TRAMA_DATA_SIZE);
+                        memset(conexionData, 0, sizeof(ConexionData));
+                        read(usuario->socketFD, tramaImagen, MAX_TRAMA_SIZE);
+
+                        int fd;
+
+                        fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
+
+                        if (funciones_error_abrir(fd)) {
+                            funciones_display("Error al guardar la imagen\n");
+                        }
+
+                        conexionData = ficheros_guardar_trama(tramaImagen);
+
+                        if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas + 4) == i) {
+                            write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
+                            i = 0;
                             descargandoImagen = false;
                             comandos_comparar_md5sum(usuario, trama, fotoData);
+                        } else {
+                            if ((fotoData->totalTramas + 4) == i) {
+                                descargandoImagen = false;
+                                comandos_comparar_md5sum(usuario, trama, fotoData);
+                            }
+                            write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
+                            i++;
                         }
-                        write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
-                        i++;
+
+                        close(fd);
                     }
 
-                    close(fd);
                 }
 
-                funciones_display("Foto descargada :)\n");
+
 
                // funciones_liberar_memoria(conexionData);
                 //funciones_liberar_memoria(fotoData->nombre);
@@ -475,9 +484,11 @@ void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fot
     if (strcmp(fotoData->md5sum, md5File) == 0) {
         trama = comandos_obtener_trama('I', "IMAGE OK");
         write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+        funciones_display("Image downloaded\n\n");
     } else {
         trama = comandos_obtener_trama('R', "IMAGE KO");
         write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+        funciones_display("Image error download\n\n");
     }
 }
 
