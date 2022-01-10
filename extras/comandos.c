@@ -338,10 +338,10 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                     funciones_liberar_memoria(conexionData);
                 } else {
-                    funciones_display("Has de realizar el login primero\n");
+                    funciones_display("Has de realizar el login primero\n\n");
                 }
             } else {
-                funciones_display("El primer parametro ha de ser un numero\n");
+                funciones_display("El primer parametro ha de ser un numero\n\n");
             }
         } else {
             funciones_display("Comanda KO. error paràmetres\n");
@@ -390,14 +390,14 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                         funciones_liberar_memoria(listadoUsuarios);
 
                     } else if (tramaRespuesta[15] == 'K') {
-                        funciones_display("No hay ningun usuario con este codigo postal\n");
+                        funciones_display("No hay ningun usuario con este codigo postal\n\n");
                     }
                 } else {
-                    funciones_display("Has de realizar el login primero\n");
+                    funciones_display("Has de realizar el login primero\n\n");
                 }
 
             } else {
-                funciones_display("El primer parametro ha de ser un numero\n");
+                funciones_display("El primer parametro ha de ser un numero\n\n");
             }
         } else {
             funciones_display("Comanda KO. error paràmetres\n");
@@ -445,7 +445,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 }
 
             } else {
-                funciones_display("Has de realizar el login primero\n");
+                funciones_display("Has de realizar el login primero\n\n");
             }
         } else {
             funciones_display("Comanda KO. error paràmetres\n");
@@ -468,7 +468,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 funciones_display("Desconectado de Atreides! Dew!\n");
                 exit(0);
             } else {
-                funciones_display("Has de realizar el login primero\n");
+                funciones_display("Has de realizar el login primero\n\n");
             }
         } else {
             funciones_display("Comanda KO. Massa paràmetres\n");
