@@ -475,6 +475,9 @@ void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fot
     if (strcmp(fotoData->md5sum, md5File) == 0) {
         trama = comandos_obtener_trama('I', "IMAGE OK");
         write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+    } else {
+        trama = comandos_obtener_trama('R', "IMAGE KO");
+        write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
     }
 }
 
