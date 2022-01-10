@@ -127,7 +127,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int soc
 
     //total
     lineaFile = strdup((funciones_read_string_to(dataTrama, "*")));
-    int tramaIndex = strlen(lineaFile)+1;
+    int tramaIndex = strlen(lineaFile) + 1;
     listadoUsuarios->total = atoi(lineaFile);
     funciones_liberar_memoria(lineaFile);
 
@@ -192,7 +192,7 @@ ListadoUsuarios *comandos_destruct_trama_respuesta(char *tramaRespuesta, int soc
         loopId = true;
 
         if (listadoUsuarios->total != totalUsuarios) {
-            if (dataTrama[tramaIndex-1] == '\0') { // quedan mas tramas por llegar
+            if (dataTrama[tramaIndex - 1] == '\0') { // quedan mas tramas por llegar
                 memset(tramaRespuesta, 0, MAX_TRAMA_SIZE);
                 read(socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
@@ -235,7 +235,6 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
     if (strcmp("LOGIN", comando) == 0) {
         if (totalParams == 2 && strcmp(instruccion[1], "") != 0 && strcmp(instruccion[2], "") != 0) {
-
             if (isdigit(*instruccion[2])) {
                 socketFD = comandos_establecer_conexion(config);
                 char *data;
@@ -271,72 +270,76 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
     } else if (strcmp("PHOTO", comando) == 0) {
         if (totalParams == 1 && strcmp(instruccion[1], "") != 0) {
             if (isdigit(*instruccion[1])) {
-                char *data;
-                asprintf(&data, "%s", instruccion[1]);
-                char *trama = comandos_obtener_trama('P', data);
-                write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                if (usuario->socketFD > 0) {
+                    char *data;
+                    asprintf(&data, "%s", instruccion[1]);
+                    char *trama = comandos_obtener_trama('P', data);
+                    write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-                //funciones_liberar_memoria(data);
-                //funciones_liberar_memoria(trama);
+                    //funciones_liberar_memoria(data);
+                    //funciones_liberar_memoria(trama);
 
-                char tramaRespuesta[MAX_TRAMA_SIZE];
-                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                    char tramaRespuesta[MAX_TRAMA_SIZE];
+                    read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
 
-                ConexionData *conexionData = ficheros_guardar_trama(tramaRespuesta);
+                    ConexionData *conexionData = ficheros_guardar_trama(tramaRespuesta);
 
-                if (tramaRespuesta[15] == 'F' && strcmp(conexionData->datos, "FILE NOT FOUND") == 0) {
-                    funciones_display("File not found\n");
-                } else {
-                    FotoData *fotoData = ficheros_destruct_data_imagen(conexionData->datos);
+                    if (tramaRespuesta[15] == 'F' && strcmp(conexionData->datos, "FILE NOT FOUND") == 0) {
+                        funciones_display("File not found\n");
+                    } else {
+                        FotoData *fotoData = ficheros_destruct_data_imagen(conexionData->datos);
 
-                    bool descargandoImagen = true;
-                    char tramaImagen[MAX_TRAMA_SIZE];
+                        bool descargandoImagen = true;
+                        char tramaImagen[MAX_TRAMA_SIZE];
 
-                    fotoData->totalTramas = fotoData->size / TRAMA_DATA_SIZE;
-                    if (fotoData->size % TRAMA_DATA_SIZE != 0) {
-                        fotoData->totalTramas++;
-                    }
+                        fotoData->totalTramas = fotoData->size / TRAMA_DATA_SIZE;
+                        if (fotoData->size % TRAMA_DATA_SIZE != 0) {
+                            fotoData->totalTramas++;
+                        }
 
-                    // en caso de existir ya la imagen borra la antigua
-                    remove(fotoData->nombre);
-
-                    // espera a que lleguen todas las tramas de la imagen
-                    while (descargandoImagen) {
-                        memset(tramaImagen, 0, TRAMA_DATA_SIZE);
-                        memset(conexionData, 0, sizeof(ConexionData));
-                        read(usuario->socketFD, tramaImagen, MAX_TRAMA_SIZE);
+                        // en caso de existir ya la imagen borra la antigua
+                        //remove(fotoData->nombre);
 
                         int fd;
 
-                        fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_APPEND, 00666);
+                        fd = open(fotoData->nombre, O_WRONLY | O_CREAT | O_TRUNC, 00666);
 
                         if (funciones_error_abrir(fd)) {
                             funciones_display("Error al guardar la imagen\n");
                         }
 
-                        conexionData = ficheros_guardar_trama(tramaImagen);
+                        // espera a que lleguen todas las tramas de la imagen
+                        while (descargandoImagen) {
+                            memset(tramaImagen, 0, TRAMA_DATA_SIZE);
+                            memset(conexionData, 0, sizeof(ConexionData));
+                            read(usuario->socketFD, tramaImagen, MAX_TRAMA_SIZE);
 
-                        if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas + 4) == i) {
-                            write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
-                            i = 0;
-                            descargandoImagen = false;
-                            comandos_comparar_md5sum(usuario, trama, fotoData);
-                        } else {
-                            if ((fotoData->totalTramas + 4) == i) {
+                            conexionData = ficheros_guardar_trama(tramaImagen);
+
+                            if (fotoData->size % TRAMA_DATA_SIZE != 0 && (fotoData->totalTramas + 4) == i) {
+                                write(fd, conexionData->datos, sizeof(char) * (fotoData->size % TRAMA_DATA_SIZE));
+                                i = 0;
                                 descargandoImagen = false;
                                 comandos_comparar_md5sum(usuario, trama, fotoData);
+                            } else {
+                                if ((fotoData->totalTramas + 4) == i) {
+                                    descargandoImagen = false;
+                                    comandos_comparar_md5sum(usuario, trama, fotoData);
+                                }
+                                write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
+                                i++;
                             }
-                            write(fd, conexionData->datos, sizeof(char) * TRAMA_DATA_SIZE);
-                            i++;
+
                         }
 
                         close(fd);
+
                     }
 
+                    funciones_liberar_memoria(conexionData);
+                } else {
+                    funciones_display("Has de realizar el login primero\n");
                 }
-
-               funciones_liberar_memoria(conexionData);
-
             } else {
                 funciones_display("El primer parametro ha de ser un numero\n");
             }
@@ -365,7 +368,8 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                     if (tramaRespuesta[15] == 'L') {
                         char auxid[30];
 
-                        ListadoUsuarios *listadoUsuarios = comandos_destruct_trama_respuesta(tramaRespuesta, usuario->socketFD);
+                        ListadoUsuarios *listadoUsuarios = comandos_destruct_trama_respuesta(tramaRespuesta,
+                                                                                             usuario->socketFD);
 
                         funciones_display("\n");
                         sprintf(print, "Hi han %d persones humanes a %s\n", listadoUsuarios->total, instruccion[1]);
@@ -400,46 +404,49 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
         }
     } else if (strcmp("SEND", comando) == 0) {
         if (totalParams == 1 && strcmp(instruccion[1], "") != 0) {
-            char sizeFileString[100];
+            if (usuario->socketFD > 0) {
+                char sizeFileString[100];
 
-            int fd = open(instruccion[1], O_RDONLY);
-            if (fd > 0) {
-                close(fd);
-                int sizeFile = funciones_get_file_size(instruccion[1]);
-                sprintf(sizeFileString, "%d", sizeFile);
+                int fd = open(instruccion[1], O_RDONLY);
+                if (fd > 0) {
+                    close(fd);
+                    int sizeFile = funciones_get_file_size(instruccion[1]);
+                    sprintf(sizeFileString, "%d", sizeFile);
 
-                char *md5File = funciones_generate_md5sum(instruccion[1]);
+                    char *md5File = funciones_generate_md5sum(instruccion[1]);
 
-                char *data;
-                asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
+                    char *data;
+                    asprintf(&data, "%s*%s*%s", instruccion[1], sizeFileString, md5File);
 
-                char *trama = comandos_obtener_trama('F', data);
-                write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
+                    char *trama = comandos_obtener_trama('F', data);
+                    write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
 
-                funciones_liberar_memoria(md5File);
-                funciones_liberar_memoria(data);
-                funciones_liberar_memoria(trama);
+                    funciones_liberar_memoria(md5File);
+                    funciones_liberar_memoria(data);
+                    funciones_liberar_memoria(trama);
 
-                int totalTramas = sizeFile / TRAMA_DATA_SIZE;
-                if (sizeFile % TRAMA_DATA_SIZE != 0) {
-                    totalTramas++;
-                }
+                    int totalTramas = sizeFile / TRAMA_DATA_SIZE;
+                    if (sizeFile % TRAMA_DATA_SIZE != 0) {
+                        totalTramas++;
+                    }
 
-                funciones_send_image(usuario->socketFD, instruccion[1], totalTramas);
+                    funciones_send_image(usuario->socketFD, instruccion[1], totalTramas);
 
-                char tramaRespuesta[MAX_TRAMA_SIZE];
-                read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
-                if (tramaRespuesta[15] == 'I') {
-                    funciones_display("Foto enviada amb èxit a Atreides.\n\n");
-                } else if (tramaRespuesta[15] == 'R') {
-                    funciones_display("Error foto no enviada a Atreides.\n\n");
+                    char tramaRespuesta[MAX_TRAMA_SIZE];
+                    read(usuario->socketFD, tramaRespuesta, MAX_TRAMA_SIZE);
+                    if (tramaRespuesta[15] == 'I') {
+                        funciones_display("Foto enviada amb èxit a Atreides.\n\n");
+                    } else if (tramaRespuesta[15] == 'R') {
+                        funciones_display("Error foto no enviada a Atreides.\n\n");
+                    }
+
+                } else {
+                    funciones_display("Error. No existe la imagen\n\n");
                 }
 
             } else {
-                funciones_display("Error. No existe la imagen\n\n");
+                funciones_display("Has de realizar el login primero\n");
             }
-
-
         } else {
             funciones_display("Comanda KO. error paràmetres\n");
         }
@@ -576,16 +583,16 @@ _Noreturn void comandos_pedir_instruccion(Configuracion config) {
 }
 
 // lee un file descriptor hasta el caracter del parametro end
-char* read_until(int fd, char end) {
+char *read_until(int fd, char end) {
     int i = 0, size;
     char c = '\0';
-    char* string = (char*)malloc(sizeof(char));
+    char *string = (char *) malloc(sizeof(char));
 
     while (1) {
         size = read(fd, &c, sizeof(char));
 
         if (c != end && size > 0) {
-            string = (char*)realloc(string, sizeof(char) * (i + 2));
+            string = (char *) realloc(string, sizeof(char) * (i + 2));
             string[i++] = c;
         } else {
             break;
