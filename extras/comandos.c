@@ -335,12 +335,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
 
                 }
 
-
-
-               // funciones_liberar_memoria(conexionData);
-                //funciones_liberar_memoria(fotoData->nombre);
-                //funciones_liberar_memoria(fotoData->md5sum);
-                //funciones_liberar_memoria(fotoData);
+               funciones_liberar_memoria(conexionData);
 
             } else {
                 funciones_display("El primer parametro ha de ser un numero\n");
@@ -439,6 +434,7 @@ int comandos_propios(char **instruccion, int totalParams, int socketFD, Usuario 
                 } else if (tramaRespuesta[15] == 'R') {
                     funciones_display("Error foto no enviada a Atreides.\n\n");
                 }
+
             } else {
                 funciones_display("Error. No existe la imagen\n\n");
             }
@@ -490,6 +486,8 @@ void comandos_comparar_md5sum(const Usuario *usuario, char *trama, FotoData *fot
         write(usuario->socketFD, trama, MAX_TRAMA_SIZE);
         funciones_display("Image error download\n\n");
     }
+
+    funciones_liberar_memoria(md5File);
 }
 
 // Se encarga de esperar una respuesta del usuario y mira si es un comando valido
